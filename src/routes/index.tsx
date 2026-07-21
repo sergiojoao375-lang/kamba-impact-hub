@@ -1,24 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/kamba/Header";
+import { Footer } from "@/components/kamba/Footer";
+import { Hero } from "@/components/kamba/Hero";
+import { ImpactStats } from "@/components/kamba/ImpactStats";
+import { HowItWorks } from "@/components/kamba/HowItWorks";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Kamba Social — Voluntariado Pro Bono em Angola" },
+      { name: "description", content: "Ligamos profissionais e estudantes a ONGs e projetos locais em Angola. Transforme o seu talento em impacto real, em conformidade com a Lei n.º 17/21." },
+      { property: "og:title", content: "Kamba Social — Voluntariado Pro Bono em Angola" },
+      { property: "og:description", content: "Plataforma angolana que conecta talento a ONGs através de voluntariado de competências." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: LandingPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function LandingPage() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      <main className="flex-1">
+        <Hero />
+        <ImpactStats />
+        <HowItWorks />
+      </main>
+      <Footer />
     </div>
   );
 }
