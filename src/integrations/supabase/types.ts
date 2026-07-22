@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          project_id: string
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+          volunteer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          project_id: string
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          volunteer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          project_id?: string
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          volunteer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ngos: {
         Row: {
           area_atuacao: string
@@ -92,6 +130,106 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          duration_weeks: number | null
+          hours_per_week: number
+          id: string
+          ngo_id: string
+          provincia: string | null
+          remote: boolean
+          skills: string[]
+          status: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description: string
+          duration_weeks?: number | null
+          hours_per_week?: number
+          id?: string
+          ngo_id: string
+          provincia?: string | null
+          remote?: boolean
+          skills?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          duration_weeks?: number | null
+          hours_per_week?: number
+          id?: string
+          ngo_id?: string
+          provincia?: string | null
+          remote?: boolean
+          skills?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_ngo_id_fkey"
+            columns: ["ngo_id"]
+            isOneToOne: false
+            referencedRelation: "ngos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          column_name: Database["public"]["Enums"]["task_column"]
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          position: number
+          project_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          column_name?: Database["public"]["Enums"]["task_column"]
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          position?: number
+          project_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          column_name?: Database["public"]["Enums"]["task_column"]
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          position?: number
+          project_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -125,10 +263,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_project_member: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "ngo" | "volunteer"
+      application_status: "pendente" | "aprovado" | "rejeitado"
       ngo_status: "pendente" | "aprovado" | "rejeitado"
+      project_status: "aberto" | "em_andamento" | "concluido" | "cancelado"
+      task_column: "a_fazer" | "em_progresso" | "concluido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -257,7 +402,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "ngo", "volunteer"],
+      application_status: ["pendente", "aprovado", "rejeitado"],
       ngo_status: ["pendente", "aprovado", "rejeitado"],
+      project_status: ["aberto", "em_andamento", "concluido", "cancelado"],
+      task_column: ["a_fazer", "em_progresso", "concluido"],
     },
   },
 } as const
