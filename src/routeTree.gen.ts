@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedAppNgoRouteImport } from './routes/_authenticated/app.ngo'
+import { Route as AuthenticatedAppFeedRouteImport } from './routes/_authenticated/app.feed'
+import { Route as AuthenticatedAppProjectProjectIdRouteImport } from './routes/_authenticated/app.project.$projectId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -23,38 +27,89 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppNgoRoute = AuthenticatedAppNgoRouteImport.update({
+  id: '/app/ngo',
+  path: '/app/ngo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppFeedRoute = AuthenticatedAppFeedRouteImport.update({
+  id: '/app/feed',
+  path: '/app/feed',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppProjectProjectIdRoute =
+  AuthenticatedAppProjectProjectIdRouteImport.update({
+    id: '/app/project/$projectId',
+    path: '/app/project/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/app/feed': typeof AuthenticatedAppFeedRoute
+  '/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/app/feed': typeof AuthenticatedAppFeedRoute
+  '/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/_authenticated/app/feed': typeof AuthenticatedAppFeedRoute
+  '/_authenticated/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/_authenticated/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/onboarding'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/app/feed'
+    | '/app/ngo'
+    | '/app/project/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/onboarding'
-  id: '__root__' | '/' | '/auth' | '/onboarding'
+  to:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/app/feed'
+    | '/app/ngo'
+    | '/app/project/$projectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/onboarding'
+    | '/_authenticated/app/feed'
+    | '/_authenticated/app/ngo'
+    | '/_authenticated/app/project/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
 }
@@ -75,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -82,11 +144,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app/ngo': {
+      id: '/_authenticated/app/ngo'
+      path: '/app/ngo'
+      fullPath: '/app/ngo'
+      preLoaderRoute: typeof AuthenticatedAppNgoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/feed': {
+      id: '/_authenticated/app/feed'
+      path: '/app/feed'
+      fullPath: '/app/feed'
+      preLoaderRoute: typeof AuthenticatedAppFeedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/project/$projectId': {
+      id: '/_authenticated/app/project/$projectId'
+      path: '/app/project/$projectId'
+      fullPath: '/app/project/$projectId'
+      preLoaderRoute: typeof AuthenticatedAppProjectProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppFeedRoute: typeof AuthenticatedAppFeedRoute
+  AuthenticatedAppNgoRoute: typeof AuthenticatedAppNgoRoute
+  AuthenticatedAppProjectProjectIdRoute: typeof AuthenticatedAppProjectProjectIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppFeedRoute: AuthenticatedAppFeedRoute,
+  AuthenticatedAppNgoRoute: AuthenticatedAppNgoRoute,
+  AuthenticatedAppProjectProjectIdRoute: AuthenticatedAppProjectProjectIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
 }
