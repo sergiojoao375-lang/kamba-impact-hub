@@ -55,9 +55,18 @@ function NgoDashboard() {
       if (ids.length) {
         const { data: ap } = await supabase
           .from("applications")
-          .select("id,status,project_id,volunteer:profiles!applications_volunteer_id_fkey(id,full_name,portfolio_url,provincia,skills)")
+          .select("id,status,project_id,volunteer_id")
           .in("project_id", ids);
-        setApps((ap ?? []) as unknown as Application[]);
+        const rows = ap ?? [];
+        const volIds = Array.from(new Set(rows.map((r) => r.volunteer_id)));
+        const { data: profs } = volIds.length
+          ? await supabase.from("profiles").select("id,full_name,portfolio_url,provincia,skills").in("id", volIds)
+          : { data: [] as any[] };
+        const byId = new Map((profs ?? []).map((p) => [p.id, p]));
+        setApps(rows.map((r) => ({
+          id: r.id, status: r.status, project_id: r.project_id,
+          volunteer: (byId.get(r.volunteer_id) as Application["volunteer"]) ?? null,
+        })));
       }
     }
     setLoading(false);
