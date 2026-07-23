@@ -1,0 +1,15 @@
+{
+  "name": "Kamba Social",
+  "short_name": "Kamba",
+  "description": "Voluntariado pro bono em Angola — ligamos talento a ONGs de impacto.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1E5AA8",
+  "lang": "pt-AO",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
