@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/app/admin")({
   component: AdminPanel,
 });
 
-type Ngo = { id: string; name: string; nif: string | null; area_atuacao: string | null; diario_republica_url: string | null; status: string; created_by: string; created_at: string };
+type Ngo = { id: string; name: string; area_atuacao: string | null; document_url: string | null; status: string; created_by: string; created_at: string };
 
 function AdminPanel() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);

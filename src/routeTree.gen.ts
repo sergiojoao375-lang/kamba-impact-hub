@@ -13,8 +13,10 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VolunteerUserIdRouteImport } from './routes/volunteer.$userId'
 import { Route as AuthenticatedAppNgoRouteImport } from './routes/_authenticated/app.ngo'
 import { Route as AuthenticatedAppFeedRouteImport } from './routes/_authenticated/app.feed'
+import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/app.admin'
 import { Route as AuthenticatedAppProjectProjectIdRouteImport } from './routes/_authenticated/app.project.$projectId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -36,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VolunteerUserIdRoute = VolunteerUserIdRouteImport.update({
+  id: '/volunteer/$userId',
+  path: '/volunteer/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppNgoRoute = AuthenticatedAppNgoRouteImport.update({
   id: '/app/ngo',
   path: '/app/ngo',
@@ -44,6 +51,11 @@ const AuthenticatedAppNgoRoute = AuthenticatedAppNgoRouteImport.update({
 const AuthenticatedAppFeedRoute = AuthenticatedAppFeedRouteImport.update({
   id: '/app/feed',
   path: '/app/feed',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
+  id: '/app/admin',
+  path: '/app/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAppProjectProjectIdRoute =
@@ -57,6 +69,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/volunteer/$userId': typeof VolunteerUserIdRoute
+  '/app/admin': typeof AuthenticatedAppAdminRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -65,6 +79,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/volunteer/$userId': typeof VolunteerUserIdRoute
+  '/app/admin': typeof AuthenticatedAppAdminRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -75,6 +91,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/volunteer/$userId': typeof VolunteerUserIdRoute
+  '/_authenticated/app/admin': typeof AuthenticatedAppAdminRoute
   '/_authenticated/app/feed': typeof AuthenticatedAppFeedRoute
   '/_authenticated/app/ngo': typeof AuthenticatedAppNgoRoute
   '/_authenticated/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -85,6 +103,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/volunteer/$userId'
+    | '/app/admin'
     | '/app/feed'
     | '/app/ngo'
     | '/app/project/$projectId'
@@ -93,6 +113,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/volunteer/$userId'
+    | '/app/admin'
     | '/app/feed'
     | '/app/ngo'
     | '/app/project/$projectId'
@@ -102,6 +124,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/onboarding'
+    | '/volunteer/$userId'
+    | '/_authenticated/app/admin'
     | '/_authenticated/app/feed'
     | '/_authenticated/app/ngo'
     | '/_authenticated/app/project/$projectId'
@@ -112,6 +136,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
+  VolunteerUserIdRoute: typeof VolunteerUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -144,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/volunteer/$userId': {
+      id: '/volunteer/$userId'
+      path: '/volunteer/$userId'
+      fullPath: '/volunteer/$userId'
+      preLoaderRoute: typeof VolunteerUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/ngo': {
       id: '/_authenticated/app/ngo'
       path: '/app/ngo'
@@ -158,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFeedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/admin': {
+      id: '/_authenticated/app/admin'
+      path: '/app/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AuthenticatedAppAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/project/$projectId': {
       id: '/_authenticated/app/project/$projectId'
       path: '/app/project/$projectId'
@@ -169,12 +208,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppAdminRoute: typeof AuthenticatedAppAdminRoute
   AuthenticatedAppFeedRoute: typeof AuthenticatedAppFeedRoute
   AuthenticatedAppNgoRoute: typeof AuthenticatedAppNgoRoute
   AuthenticatedAppProjectProjectIdRoute: typeof AuthenticatedAppProjectProjectIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppAdminRoute: AuthenticatedAppAdminRoute,
   AuthenticatedAppFeedRoute: AuthenticatedAppFeedRoute,
   AuthenticatedAppNgoRoute: AuthenticatedAppNgoRoute,
   AuthenticatedAppProjectProjectIdRoute: AuthenticatedAppProjectProjectIdRoute,
@@ -188,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
+  VolunteerUserIdRoute: VolunteerUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
