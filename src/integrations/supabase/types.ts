@@ -52,6 +52,38 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          project_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          project_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ngos: {
         Row: {
           area_atuacao: string
@@ -88,6 +120,39 @@ export type Database = {
           provincia?: string
           status?: Database["public"]["Enums"]["ngo_status"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -192,6 +257,7 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          hours_logged: number
           id: string
           position: number
           project_id: string
@@ -203,6 +269,7 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          hours_logged?: number
           id?: string
           position?: number
           project_id: string
@@ -214,6 +281,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          hours_logged?: number
           id?: string
           position?: number
           project_id?: string
