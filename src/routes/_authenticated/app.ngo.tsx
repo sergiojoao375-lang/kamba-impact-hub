@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
 import { Plus, Check, X, ExternalLink, KanbanSquare } from "lucide-react";
 import { toast } from "sonner";
+import { notify } from "@/components/kamba/NotificationsBell";
 
 export const Route = createFileRoute("/_authenticated/app/ngo")({
   head: () => ({
@@ -75,9 +76,23 @@ function NgoDashboard() {
   useEffect(() => { load(); }, []);
 
   const decide = async (id: string, status: "aprovado" | "rejeitado") => {
+    const app = apps.find((x) => x.id === id);
     const { error } = await supabase.from("applications").update({ status }).eq("id", id);
     if (error) toast.error(error.message);
-    else { toast.success(status === "aprovado" ? "Voluntário aprovado" : "Candidatura recusada"); load(); }
+    else {
+      toast.success(status === "aprovado" ? "Voluntário aprovado" : "Candidatura recusada");
+      const proj = projects.find((p) => p.id === app?.project_id);
+      if (app?.volunteer?.id && proj) {
+        await notify(
+          app.volunteer.id,
+          "application",
+          status === "aprovado" ? "Candidatura aprovada!" : "Candidatura não selecionada",
+          `${proj.title} · ${ngo?.name ?? ""}`,
+          status === "aprovado" ? `/app/project/${proj.id}` : "/app/feed",
+        );
+      }
+      load();
+    }
   };
 
   return (

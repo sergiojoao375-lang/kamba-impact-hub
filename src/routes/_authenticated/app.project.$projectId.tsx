@@ -5,8 +5,9 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { ChatPanel } from "@/components/kamba/ChatPanel";
 
 export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   head: () => ({
@@ -18,8 +19,8 @@ export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   component: ProjectRoom,
 });
 
-type Task = { id: string; title: string; column_name: "a_fazer" | "em_progresso" | "concluido"; position: number };
-type Project = { id: string; title: string; description: string; ngo: { name: string } | null };
+type Task = { id: string; title: string; column_name: "a_fazer" | "em_progresso" | "concluido"; position: number; hours_logged: number };
+type Project = { id: string; title: string; description: string; created_by: string; ngo: { name: string } | null };
 
 const COLUMNS: { key: Task["column_name"]; label: string; tone: string }[] = [
   { key: "a_fazer", label: "A Fazer", tone: "bg-slate-100" },
@@ -33,13 +34,18 @@ function ProjectRoom() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState<Record<string, string>>({});
   const [dragId, setDragId] = useState<string | null>(null);
+  const [memberIds, setMemberIds] = useState<string[]>([]);
 
   const load = async () => {
-    const { data: p } = await supabase.from("projects").select("id,title,description,ngo:ngos(name)").eq("id", projectId).maybeSingle();
+    const { data: p } = await supabase.from("projects").select("id,title,description,created_by,ngo:ngos(name)").eq("id", projectId).maybeSingle();
     setProject(p as unknown as Project);
-    const { data: t, error } = await supabase.from("tasks").select("id,title,column_name,position").eq("project_id", projectId).order("position");
+    const { data: t, error } = await supabase.from("tasks").select("id,title,column_name,position,hours_logged").eq("project_id", projectId).order("position");
     if (error) toast.error(error.message);
     setTasks((t ?? []) as Task[]);
+    const { data: apps } = await supabase.from("applications").select("volunteer_id").eq("project_id", projectId).eq("status", "aprovado");
+    const ids = new Set<string>((apps ?? []).map((a) => a.volunteer_id));
+    if (p) ids.add((p as any).created_by);
+    setMemberIds(Array.from(ids));
   };
 
   useEffect(() => { load(); }, [projectId]);
@@ -99,12 +105,32 @@ function ProjectRoom() {
                       draggable
                       onDragStart={() => setDragId(t.id)}
                       onDragEnd={() => setDragId(null)}
-                      className="p-3 text-sm bg-background cursor-grab active:cursor-grabbing flex items-start justify-between gap-2 group"
+                      className="p-3 text-sm bg-background cursor-grab active:cursor-grabbing group"
                     >
-                      <span>{t.title}</span>
-                      <button onClick={() => remove(t.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      <div className="flex items-start justify-between gap-2">
+                        <span>{t.title}</span>
+                        <button onClick={() => remove(t.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      {col.key === "concluido" && (
+                        <label className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <input
+                            type="number"
+                            min={0}
+                            step={0.5}
+                            defaultValue={t.hours_logged}
+                            onBlur={async (e) => {
+                              const h = Number(e.target.value) || 0;
+                              await supabase.from("tasks").update({ hours_logged: h }).eq("id", t.id);
+                              load();
+                            }}
+                            className="w-16 h-6 rounded border bg-background px-1"
+                          />
+                          horas
+                        </label>
+                      )}
                     </Card>
                   ))}
                 </div>
@@ -123,7 +149,11 @@ function ProjectRoom() {
           })}
         </div>
 
-        <p className="text-xs text-muted-foreground">Arraste os cartões entre as colunas para atualizar o progresso.</p>
+        {project && memberIds.length > 0 && (
+          <ChatPanel projectId={projectId} projectTitle={project.title} memberIds={memberIds} />
+        )}
+
+        <p className="text-xs text-muted-foreground">Arraste os cartões entre as colunas para atualizar o progresso. Registe as horas nas tarefas concluídas para gerar o certificado.</p>
       </div>
     </AppShell>
   );
