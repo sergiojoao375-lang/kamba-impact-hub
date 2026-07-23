@@ -5,8 +5,9 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { ChatPanel } from "@/components/kamba/ChatPanel";
 
 export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   head: () => ({
@@ -18,8 +19,8 @@ export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   component: ProjectRoom,
 });
 
-type Task = { id: string; title: string; column_name: "a_fazer" | "em_progresso" | "concluido"; position: number };
-type Project = { id: string; title: string; description: string; ngo: { name: string } | null };
+type Task = { id: string; title: string; column_name: "a_fazer" | "em_progresso" | "concluido"; position: number; hours_logged: number };
+type Project = { id: string; title: string; description: string; created_by: string; ngo: { name: string } | null };
 
 const COLUMNS: { key: Task["column_name"]; label: string; tone: string }[] = [
   { key: "a_fazer", label: "A Fazer", tone: "bg-slate-100" },
@@ -33,13 +34,18 @@ function ProjectRoom() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState<Record<string, string>>({});
   const [dragId, setDragId] = useState<string | null>(null);
+  const [memberIds, setMemberIds] = useState<string[]>([]);
 
   const load = async () => {
-    const { data: p } = await supabase.from("projects").select("id,title,description,ngo:ngos(name)").eq("id", projectId).maybeSingle();
+    const { data: p } = await supabase.from("projects").select("id,title,description,created_by,ngo:ngos(name)").eq("id", projectId).maybeSingle();
     setProject(p as unknown as Project);
-    const { data: t, error } = await supabase.from("tasks").select("id,title,column_name,position").eq("project_id", projectId).order("position");
+    const { data: t, error } = await supabase.from("tasks").select("id,title,column_name,position,hours_logged").eq("project_id", projectId).order("position");
     if (error) toast.error(error.message);
     setTasks((t ?? []) as Task[]);
+    const { data: apps } = await supabase.from("applications").select("volunteer_id").eq("project_id", projectId).eq("status", "aprovado");
+    const ids = new Set<string>((apps ?? []).map((a) => a.volunteer_id));
+    if (p) ids.add((p as any).created_by);
+    setMemberIds(Array.from(ids));
   };
 
   useEffect(() => { load(); }, [projectId]);
