@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
+import { notify } from "@/components/kamba/NotificationsBell";
 
 export const Route = createFileRoute("/_authenticated/app/feed")({
   head: () => ({
@@ -66,6 +67,11 @@ function FeedPage() {
     else {
       toast.success("Candidatura enviada!");
       setApplied((s) => new Set(s).add(projectId));
+      const proj = projects.find((p) => p.id === projectId);
+      const { data: pdata } = await supabase.from("projects").select("created_by,title").eq("id", projectId).maybeSingle();
+      if (pdata?.created_by) {
+        await notify(pdata.created_by, "application", "Nova candidatura recebida", proj?.title ?? pdata.title, "/app/ngo");
+      }
     }
     setApplyingId(null);
   };
