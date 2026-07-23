@@ -105,12 +105,32 @@ function ProjectRoom() {
                       draggable
                       onDragStart={() => setDragId(t.id)}
                       onDragEnd={() => setDragId(null)}
-                      className="p-3 text-sm bg-background cursor-grab active:cursor-grabbing flex items-start justify-between gap-2 group"
+                      className="p-3 text-sm bg-background cursor-grab active:cursor-grabbing group"
                     >
-                      <span>{t.title}</span>
-                      <button onClick={() => remove(t.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                      <div className="flex items-start justify-between gap-2">
+                        <span>{t.title}</span>
+                        <button onClick={() => remove(t.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      {col.key === "concluido" && (
+                        <label className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          <input
+                            type="number"
+                            min={0}
+                            step={0.5}
+                            defaultValue={t.hours_logged}
+                            onBlur={async (e) => {
+                              const h = Number(e.target.value) || 0;
+                              await supabase.from("tasks").update({ hours_logged: h }).eq("id", t.id);
+                              load();
+                            }}
+                            className="w-16 h-6 rounded border bg-background px-1"
+                          />
+                          horas
+                        </label>
+                      )}
                     </Card>
                   ))}
                 </div>
@@ -129,7 +149,11 @@ function ProjectRoom() {
           })}
         </div>
 
-        <p className="text-xs text-muted-foreground">Arraste os cartões entre as colunas para atualizar o progresso.</p>
+        {project && memberIds.length > 0 && (
+          <ChatPanel projectId={projectId} projectTitle={project.title} memberIds={memberIds} />
+        )}
+
+        <p className="text-xs text-muted-foreground">Arraste os cartões entre as colunas para atualizar o progresso. Registe as horas nas tarefas concluídas para gerar o certificado.</p>
       </div>
     </AppShell>
   );
