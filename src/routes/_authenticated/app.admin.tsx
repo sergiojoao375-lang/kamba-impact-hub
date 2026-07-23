@@ -77,12 +77,12 @@ function AdminPanel() {
                 <div className="flex items-start justify-between gap-2 flex-wrap">
                   <div>
                     <div className="font-medium">{n.name}</div>
-                    <div className="text-xs text-muted-foreground">NIF: {n.nif ?? "—"} · Área: {n.area_atuacao ?? "—"}</div>
+                    <div className="text-xs text-muted-foreground">Área: {n.area_atuacao ?? "—"}</div>
                   </div>
                   <Badge variant="secondary">{n.status}</Badge>
                 </div>
-                {n.diario_republica_url && (
-                  <a href={n.diario_republica_url} target="_blank" rel="noreferrer" className="text-xs text-[color:var(--brand,#1E5AA8)] inline-flex items-center gap-1">
+                {n.document_url && (
+                  <a href={n.document_url} target="_blank" rel="noreferrer" className="text-xs text-[color:var(--brand,#1E5AA8)] inline-flex items-center gap-1">
                     Ver Diário da República <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
