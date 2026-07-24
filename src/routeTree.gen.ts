@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VolunteerUserIdRouteImport } from './routes/volunteer.$userId'
 import { Route as AuthenticatedAppNgoRouteImport } from './routes/_authenticated/app.ngo'
 import { Route as AuthenticatedAppFeedRouteImport } from './routes/_authenticated/app.feed'
+import { Route as AuthenticatedAppEsgRouteImport } from './routes/_authenticated/app.esg'
 import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/app.admin'
 import { Route as AuthenticatedAppProjectProjectIdRouteImport } from './routes/_authenticated/app.project.$projectId'
 
@@ -53,6 +54,11 @@ const AuthenticatedAppFeedRoute = AuthenticatedAppFeedRouteImport.update({
   path: '/app/feed',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppEsgRoute = AuthenticatedAppEsgRouteImport.update({
+  id: '/app/esg',
+  path: '/app/esg',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
   id: '/app/admin',
   path: '/app/admin',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/app/admin': typeof AuthenticatedAppAdminRoute
+  '/app/esg': typeof AuthenticatedAppEsgRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/app/admin': typeof AuthenticatedAppAdminRoute
+  '/app/esg': typeof AuthenticatedAppEsgRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRoute
+  '/_authenticated/app/esg': typeof AuthenticatedAppEsgRoute
   '/_authenticated/app/feed': typeof AuthenticatedAppFeedRoute
   '/_authenticated/app/ngo': typeof AuthenticatedAppNgoRoute
   '/_authenticated/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/volunteer/$userId'
     | '/app/admin'
+    | '/app/esg'
     | '/app/feed'
     | '/app/ngo'
     | '/app/project/$projectId'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/volunteer/$userId'
     | '/app/admin'
+    | '/app/esg'
     | '/app/feed'
     | '/app/ngo'
     | '/app/project/$projectId'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/volunteer/$userId'
     | '/_authenticated/app/admin'
+    | '/_authenticated/app/esg'
     | '/_authenticated/app/feed'
     | '/_authenticated/app/ngo'
     | '/_authenticated/app/project/$projectId'
@@ -190,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFeedRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/esg': {
+      id: '/_authenticated/app/esg'
+      path: '/app/esg'
+      fullPath: '/app/esg'
+      preLoaderRoute: typeof AuthenticatedAppEsgRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/admin': {
       id: '/_authenticated/app/admin'
       path: '/app/admin'
@@ -209,6 +228,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppAdminRoute: typeof AuthenticatedAppAdminRoute
+  AuthenticatedAppEsgRoute: typeof AuthenticatedAppEsgRoute
   AuthenticatedAppFeedRoute: typeof AuthenticatedAppFeedRoute
   AuthenticatedAppNgoRoute: typeof AuthenticatedAppNgoRoute
   AuthenticatedAppProjectProjectIdRoute: typeof AuthenticatedAppProjectProjectIdRoute
@@ -216,6 +236,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppAdminRoute: AuthenticatedAppAdminRoute,
+  AuthenticatedAppEsgRoute: AuthenticatedAppEsgRoute,
   AuthenticatedAppFeedRoute: AuthenticatedAppFeedRoute,
   AuthenticatedAppNgoRoute: AuthenticatedAppNgoRoute,
   AuthenticatedAppProjectProjectIdRoute: AuthenticatedAppProjectProjectIdRoute,
