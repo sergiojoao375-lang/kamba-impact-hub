@@ -9,6 +9,7 @@ import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { notify } from "@/components/kamba/NotificationsBell";
+import { notifyMatch } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/app/feed")({
   head: () => ({
