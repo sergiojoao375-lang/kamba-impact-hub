@@ -15,6 +15,7 @@ import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
 import { Plus, Check, X, ExternalLink, KanbanSquare } from "lucide-react";
 import { toast } from "sonner";
 import { notify } from "@/components/kamba/NotificationsBell";
+import { notifyApproved } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/app/ngo")({
   head: () => ({
@@ -90,6 +91,11 @@ function NgoDashboard() {
           `${proj.title} · ${ngo?.name ?? ""}`,
           status === "aprovado" ? `/app/project/${proj.id}` : "/app/feed",
         );
+        // Fase 4 · Gatilho WhatsApp — "Aprovado numa Candidatura"
+        if (status === "aprovado") {
+          const { data: vp } = await supabase.from("profiles").select("phone").eq("id", app.volunteer.id).maybeSingle();
+          if (vp?.phone) notifyApproved(vp.phone, proj.title, ngo?.name ?? "ONG");
+        }
       }
       load();
     }
