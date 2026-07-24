@@ -44,6 +44,26 @@ function FeedPage() {
       if (uid) {
         const { data: apps } = await supabase.from("applications").select("project_id").eq("volunteer_id", uid);
         setApplied(new Set((apps ?? []).map((a) => a.project_id)));
+
+        // Fase 4 · Gatilho WhatsApp — "Match de Nova Vaga"
+        // Ao carregar o feed, notifica o voluntário sobre projetos compatíveis
+        // com as suas skills/província que ainda não foram candidatados.
+        const { data: me } = await supabase
+          .from("profiles")
+          .select("phone,skills,provincia")
+          .eq("id", uid)
+          .maybeSingle();
+        if (me?.phone && me.skills?.length) {
+          const appliedSet = new Set((apps ?? []).map((a) => a.project_id));
+          const matches = (data ?? []).filter((p: any) =>
+            !appliedSet.has(p.id) &&
+            (p.skills ?? []).some((s: string) => me.skills!.includes(s)) &&
+            (p.remote || p.provincia === me.provincia),
+          );
+          matches.slice(0, 3).forEach((p: any) =>
+            notifyMatch(me.phone!, p.title, p.ngo?.name ?? "ONG parceira"),
+          );
+        }
       }
       setLoading(false);
     })();
