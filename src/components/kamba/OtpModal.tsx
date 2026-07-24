@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
+import { toast } from "sonner";
+import { generateOtp, sendOtp } from "@/lib/whatsapp";
 
 export function OtpModal({
   open, onOpenChange, phone, onSuccess,
@@ -13,7 +15,27 @@ export function OtpModal({
   onSuccess: () => void;
 }) {
   const [code, setCode] = useState("");
+  const [expected, setExpected] = useState<string>("");
   const canSubmit = code.length === 6;
+
+  // Fase 4 · Simulação de OTP via WhatsApp Business API
+  useEffect(() => {
+    if (!open) { setCode(""); return; }
+    const otp = generateOtp();
+    setExpected(otp);
+    // Em produção → server function POST /messages (template kamba_otp)
+    sendOtp(`244${phone}`, otp);
+    // Dica visível apenas em ambiente de desenvolvimento
+    toast.info(`[DEV] Código simulado: ${otp}`, { duration: 8000 });
+  }, [open, phone]);
+
+  const submit = () => {
+    if (code !== expected) {
+      toast.error("Código incorreto. Tente novamente.");
+      return;
+    }
+    onSuccess();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,7 +69,7 @@ export function OtpModal({
 
         <Button
           disabled={!canSubmit}
-          onClick={onSuccess}
+          onClick={submit}
           className="w-full bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"
         >
           Validar código
