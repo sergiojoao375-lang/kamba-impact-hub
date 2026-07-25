@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/kamba/AppShell";
@@ -10,6 +10,44 @@ import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { notify } from "@/components/kamba/NotificationsBell";
 import { notifyMatch } from "@/lib/whatsapp";
+
+// Vagas mockadas para demo end-to-end quando não há sessão / DB vazia.
+const DEMO_PROJECTS: ProjectCardData[] = [
+  {
+    id: "demo-1",
+    title: "Site institucional para ONG de educação",
+    description: "Redesign do site com foco em captação de doações e transparência financeira.",
+    skills: ["Design", "Tecnologia"],
+    provincia: "Luanda",
+    remote: false,
+    hours_per_week: 6,
+    duration_weeks: 8,
+    ngo: { name: "Fundação Kubuka Angola", status: "aprovado", area_atuacao: "Educação" },
+  },
+  {
+    id: "demo-2",
+    title: "Consultoria contabilística pro bono",
+    description: "Apoio na organização das contas anuais e submissão à AGT.",
+    skills: ["Finanças", "Contabilidade"],
+    provincia: "Benguela",
+    remote: true,
+    hours_per_week: 4,
+    duration_weeks: 12,
+    ngo: { name: "Associação Mãos que Ajudam", status: "aprovado", area_atuacao: "Saúde" },
+  },
+  {
+    id: "demo-3",
+    title: "Campanha de marketing digital",
+    description: "Estratégia de redes sociais para captação de voluntários no interior.",
+    skills: ["Marketing"],
+    provincia: "Huíla",
+    remote: true,
+    hours_per_week: 5,
+    duration_weeks: 6,
+    ngo: { name: "Rede Jovens de Impacto", status: "pendente", area_atuacao: "Juventude" },
+  },
+];
+
 
 export const Route = createFileRoute("/_authenticated/app/feed")({
   head: () => ({
