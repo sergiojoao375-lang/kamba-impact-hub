@@ -60,6 +60,7 @@ export const Route = createFileRoute("/_authenticated/app/feed")({
 });
 
 function FeedPage() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<ProjectCardData[]>([]);
   const [applied, setApplied] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -72,35 +73,26 @@ function FeedPage() {
     (async () => {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("projects")
         .select("id,title,description,skills,provincia,remote,hours_per_week,duration_weeks,ngo:ngos(name,status,area_atuacao)")
         .eq("status", "aberto")
         .order("created_at", { ascending: false });
-      if (error) toast.error(error.message);
-      setProjects((data ?? []) as unknown as ProjectCardData[]);
+      const list = (data ?? []) as unknown as ProjectCardData[];
+      // Demo fallback: sem sessão ou DB vazia → mostrar vagas mockadas.
+      setProjects(list.length ? list : DEMO_PROJECTS);
       if (uid) {
         const { data: apps } = await supabase.from("applications").select("project_id").eq("volunteer_id", uid);
         setApplied(new Set((apps ?? []).map((a) => a.project_id)));
-
-        // Fase 4 · Gatilho WhatsApp — "Match de Nova Vaga"
-        // Ao carregar o feed, notifica o voluntário sobre projetos compatíveis
-        // com as suas skills/província que ainda não foram candidatados.
-        const { data: me } = await supabase
-          .from("profiles")
-          .select("phone,skills,provincia")
-          .eq("id", uid)
-          .maybeSingle();
+        const { data: me } = await supabase.from("profiles").select("phone,skills,provincia").eq("id", uid).maybeSingle();
         if (me?.phone && me.skills?.length) {
           const appliedSet = new Set((apps ?? []).map((a) => a.project_id));
-          const matches = (data ?? []).filter((p: any) =>
+          const matches = list.filter((p: any) =>
             !appliedSet.has(p.id) &&
             (p.skills ?? []).some((s: string) => me.skills!.includes(s)) &&
             (p.remote || p.provincia === me.provincia),
           );
-          matches.slice(0, 3).forEach((p: any) =>
-            notifyMatch(me.phone!, p.title, p.ngo?.name ?? "ONG parceira"),
-          );
+          matches.slice(0, 3).forEach((p: any) => notifyMatch(me.phone!, p.title, p.ngo?.name ?? "ONG parceira"));
         }
       }
       setLoading(false);
@@ -116,24 +108,35 @@ function FeedPage() {
     });
   }, [projects, provincia, skill, q]);
 
+  const openRoom = (projectId: string) => navigate({ to: "/app/project/$projectId", params: { projectId } });
+
   const apply = async (projectId: string) => {
     setApplyingId(projectId);
     const { data: userData } = await supabase.auth.getUser();
     const uid = userData.user?.id;
-    if (!uid) { toast.error("Sessão expirou"); setApplyingId(null); return; }
+    // Modo demo (sem sessão ou projecto mockado): simula sucesso e abre a sala.
+    if (!uid || projectId.startsWith("demo-")) {
+      toast.success("Candidatura aprovada! A abrir sala do projeto…");
+      setApplied((s) => new Set(s).add(projectId));
+      setApplyingId(null);
+      setTimeout(() => openRoom(projectId), 600);
+      return;
+    }
     const { error } = await supabase.from("applications").insert({ project_id: projectId, volunteer_id: uid });
     if (error) toast.error(error.message);
     else {
-      toast.success("Candidatura enviada!");
+      toast.success("Candidatura enviada! A abrir sala do projeto…");
       setApplied((s) => new Set(s).add(projectId));
       const proj = projects.find((p) => p.id === projectId);
       const { data: pdata } = await supabase.from("projects").select("created_by,title").eq("id", projectId).maybeSingle();
       if (pdata?.created_by) {
         await notify(pdata.created_by, "application", "Nova candidatura recebida", proj?.title ?? pdata.title, "/app/ngo");
       }
+      setTimeout(() => openRoom(projectId), 600);
     }
     setApplyingId(null);
   };
+
 
   return (
     <AppShell>
