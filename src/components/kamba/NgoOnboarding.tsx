@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,9 +9,16 @@ import { AREAS_ATUACAO, PROVINCIAS_ANGOLA } from "@/lib/angola";
 import { UploadCloud, FileCheck2, Clock } from "lucide-react";
 
 export function NgoOnboarding() {
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const submit = () => {
+    toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
+    navigate({ to: "/app/ngo" });
+  };
+
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -90,7 +99,7 @@ export function NgoOnboarding() {
         </div>
       </div>
 
-      <Button className="w-full bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90" size="lg">
+      <Button onClick={submit} className="w-full bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90" size="lg">
         Enviar cadastro para verificação
       </Button>
     </div>

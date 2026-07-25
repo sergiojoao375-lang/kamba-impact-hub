@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,12 +10,23 @@ import { COMPETENCIAS, PROVINCIAS_ANGOLA } from "@/lib/angola";
 import { Check } from "lucide-react";
 
 export function VolunteerOnboarding() {
+  const navigate = useNavigate();
   const [skills, setSkills] = useState<string[]>([]);
   const [provincia, setProvincia] = useState("");
   const [link, setLink] = useState("");
 
   const toggle = (s: string) =>
     setSkills((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+
+  const submit = () => {
+    if (!skills.length || !provincia) {
+      toast.error("Selecione ao menos uma competência e a sua província.");
+      return;
+    }
+    toast.success("Perfil criado! A abrir vagas Pro Bono…");
+    navigate({ to: "/app/feed" });
+  };
+
 
   return (
     <div className="space-y-6">
@@ -80,8 +93,8 @@ export function VolunteerOnboarding() {
         </div>
       </div>
 
-      <Button className="w-full bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90" size="lg">
-        Concluir cadastro
+      <Button onClick={submit} className="w-full bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90" size="lg">
+        Concluir cadastro e ver vagas
       </Button>
     </div>
   );
