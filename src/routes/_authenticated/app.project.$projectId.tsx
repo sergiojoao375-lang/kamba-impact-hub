@@ -36,7 +36,26 @@ function ProjectRoom() {
   const [dragId, setDragId] = useState<string | null>(null);
   const [memberIds, setMemberIds] = useState<string[]>([]);
 
+  const isDemo = projectId.startsWith("demo-");
+
   const load = async () => {
+    if (isDemo) {
+      setProject({
+        id: projectId,
+        title: "Projeto Demo · Kamba Social",
+        description: "Sala de projeto simulada para testar o quadro Kanban colaborativo.",
+        created_by: "demo",
+        ngo: { name: "ONG Demo" },
+      });
+      setTasks([
+        { id: "d1", title: "Reunião de alinhamento inicial", column_name: "a_fazer", position: 0, hours_logged: 0 },
+        { id: "d2", title: "Definir escopo e entregáveis", column_name: "a_fazer", position: 1, hours_logged: 0 },
+        { id: "d3", title: "Wireframes v1", column_name: "em_progresso", position: 0, hours_logged: 0 },
+        { id: "d4", title: "Kickoff assinado", column_name: "concluido", position: 0, hours_logged: 2 },
+      ]);
+      setMemberIds([]);
+      return;
+    }
     const { data: p } = await supabase.from("projects").select("id,title,description,created_by,ngo:ngos(name)").eq("id", projectId).maybeSingle();
     setProject(p as unknown as Project);
     const { data: t, error } = await supabase.from("tasks").select("id,title,column_name,position,hours_logged").eq("project_id", projectId).order("position");
@@ -53,6 +72,11 @@ function ProjectRoom() {
   const addTask = async (col: Task["column_name"]) => {
     const title = (newTitle[col] ?? "").trim();
     if (!title) return;
+    if (isDemo) {
+      setTasks((cur) => [...cur, { id: `d${Date.now()}`, title, column_name: col, position: cur.length, hours_logged: 0 }]);
+      setNewTitle((s) => ({ ...s, [col]: "" }));
+      return;
+    }
     const { data: userData } = await supabase.auth.getUser();
     const uid = userData.user?.id;
     if (!uid) return;
@@ -64,14 +88,17 @@ function ProjectRoom() {
 
   const move = async (taskId: string, col: Task["column_name"]) => {
     setTasks((cur) => cur.map((t) => t.id === taskId ? { ...t, column_name: col } : t));
+    if (isDemo) return;
     const { error } = await supabase.from("tasks").update({ column_name: col }).eq("id", taskId);
     if (error) { toast.error(error.message); load(); }
   };
 
   const remove = async (id: string) => {
+    if (isDemo) { setTasks((cur) => cur.filter((t) => t.id !== id)); return; }
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (error) toast.error(error.message); else load();
   };
+
 
   return (
     <AppShell>

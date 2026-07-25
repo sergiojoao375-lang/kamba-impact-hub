@@ -1,12 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
+// Modo DEMO: acesso destravado para permitir teste end-to-end do MVP no Preview.
+// Em produção, restaurar o gate com supabase.auth.getUser() + redirect("/auth").
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/auth" });
-    return { user: data.user };
-  },
   component: () => <Outlet />,
 });
