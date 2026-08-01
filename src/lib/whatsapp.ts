@@ -54,6 +54,19 @@ export async function notifyApproved(phone: string, projectTitle: string, ngoNam
   // TODO(produção): await sendWhatsAppTemplate(...)
 }
 
+/**
+ * ONG verificada pelo Admin (Painel /app/admin).
+ * Em produção: template aprovado `kamba_ngo_approved`, idioma pt_PT.
+ */
+export async function notifyNgoApproved(phone: string, ngoName: string) {
+  simulateSend({
+    phone,
+    template: "ngo_approved",
+    params: { ngoName },
+  });
+  // TODO(produção): await sendWhatsAppTemplate(...)
+}
+
 /** OTP de 6 dígitos enviado no login por telefone. */
 export function generateOtp(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
