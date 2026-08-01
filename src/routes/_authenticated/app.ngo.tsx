@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
-import { Plus, Check, X, ExternalLink, KanbanSquare } from "lucide-react";
+import { Plus, Check, X, ExternalLink, KanbanSquare, TriangleAlert, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { notify } from "@/components/kamba/NotificationsBell";
 import { notifyApproved } from "@/lib/whatsapp";
