@@ -17,7 +17,7 @@
  *      `notifyMatch` / `notifyApproved` abaixo.
  */
 
-export type WhatsAppTemplate = "new_match" | "approved" | "otp";
+export type WhatsAppTemplate = "new_match" | "approved" | "otp" | "ngo_approved";
 
 interface SendArgs {
   phone: string; // formato E.164 sem "+", ex.: 244923456789
@@ -50,6 +50,19 @@ export async function notifyApproved(phone: string, projectTitle: string, ngoNam
     phone,
     template: "approved",
     params: { projectTitle, ngoName },
+  });
+  // TODO(produção): await sendWhatsAppTemplate(...)
+}
+
+/**
+ * ONG verificada pelo Admin (Painel /app/admin).
+ * Em produção: template aprovado `kamba_ngo_approved`, idioma pt_PT.
+ */
+export async function notifyNgoApproved(phone: string, ngoName: string) {
+  simulateSend({
+    phone,
+    template: "ngo_approved",
+    params: { ngoName },
   });
   // TODO(produção): await sendWhatsAppTemplate(...)
 }

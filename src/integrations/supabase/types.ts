@@ -93,6 +93,8 @@ export type Database = {
           document_url: string | null
           id: string
           name: string
+          nif: string | null
+          phone: string | null
           provincia: string
           status: Database["public"]["Enums"]["ngo_status"]
           updated_at: string
@@ -105,6 +107,8 @@ export type Database = {
           document_url?: string | null
           id?: string
           name: string
+          nif?: string | null
+          phone?: string | null
           provincia: string
           status?: Database["public"]["Enums"]["ngo_status"]
           updated_at?: string
@@ -117,6 +121,8 @@ export type Database = {
           document_url?: string | null
           id?: string
           name?: string
+          nif?: string | null
+          phone?: string | null
           provincia?: string
           status?: Database["public"]["Enums"]["ngo_status"]
           updated_at?: string

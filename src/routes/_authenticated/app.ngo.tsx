@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
-import { Plus, Check, X, ExternalLink, KanbanSquare } from "lucide-react";
+import { Plus, Check, X, ExternalLink, KanbanSquare, TriangleAlert, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { notify } from "@/components/kamba/NotificationsBell";
 import { notifyApproved } from "@/lib/whatsapp";
@@ -36,48 +36,88 @@ type Application = {
   volunteer: { id: string; full_name: string | null; portfolio_url: string | null; provincia: string | null; skills: string[] } | null;
 };
 
+const DEMO_NGO: Ngo = { id: "demo-ngo", name: "Associação Kubuka", status: "aprovado" };
+const DEMO_PROJECTS: Project[] = [
+  { id: "demo-p1", title: "Website institucional", description: "Criação do site da ONG.", status: "aberto", provincia: "Luanda", remote: true, hours_per_week: 6 },
+  { id: "demo-p2", title: "Organização contabilística", description: "Balanço anual da associação.", status: "aberto", provincia: "Benguela", remote: false, hours_per_week: 4 },
+];
+const DEMO_APPS: Application[] = [
+  { id: "demo-a1", status: "pendente", project_id: "demo-p1", volunteer: { id: "demo-v1", full_name: "Ana Kiala", portfolio_url: null, provincia: "Luanda", skills: ["Design", "Programação"] } },
+  { id: "demo-a2", status: "pendente", project_id: "demo-p2", volunteer: { id: "demo-v2", full_name: "Paulo Mendes", portfolio_url: null, provincia: "Benguela", skills: ["Contabilidade"] } },
+  { id: "demo-a3", status: "aprovado", project_id: "demo-p1", volunteer: { id: "demo-v3", full_name: "Teresa Nzinga", portfolio_url: null, provincia: "Huíla", skills: ["Marketing"] } },
+];
+
 function NgoDashboard() {
   const [ngo, setNgo] = useState<Ngo | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [demo, setDemo] = useState(false);
+
+  const enterDemo = () => {
+    setNgo(DEMO_NGO);
+    setProjects(DEMO_PROJECTS);
+    setApps(DEMO_APPS);
+    setDemo(true);
+  };
 
   const load = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const uid = userData.user?.id;
-    if (!uid) return;
-    const { data: ngos } = await supabase.from("ngos").select("id,name,status").eq("created_by", uid).limit(1);
-    const myNgo = (ngos ?? [])[0] ?? null;
-    setNgo(myNgo);
-    if (myNgo) {
-      const { data: pr } = await supabase.from("projects").select("id,title,description,status,provincia,remote,hours_per_week").eq("ngo_id", myNgo.id).order("created_at", { ascending: false });
-      setProjects((pr ?? []) as Project[]);
-      const ids = (pr ?? []).map((p) => p.id);
-      if (ids.length) {
-        const { data: ap } = await supabase
-          .from("applications")
-          .select("id,status,project_id,volunteer_id")
-          .in("project_id", ids);
-        const rows = ap ?? [];
-        const volIds = Array.from(new Set(rows.map((r) => r.volunteer_id)));
-        const { data: profs } = volIds.length
-          ? await supabase.from("profiles").select("id,full_name,portfolio_url,provincia,skills").in("id", volIds)
-          : { data: [] as any[] };
-        const byId = new Map((profs ?? []).map((p) => [p.id, p]));
-        setApps(rows.map((r) => ({
-          id: r.id, status: r.status, project_id: r.project_id,
-          volunteer: (byId.get(r.volunteer_id) as Application["volunteer"]) ?? null,
-        })));
+    setLoading(true);
+    setDemo(false);
+    const timeout = new Promise<"timeout">((r) => setTimeout(() => r("timeout"), 5000));
+    try {
+      const work = (async () => {
+        const { data: userData } = await supabase.auth.getUser();
+        const uid = userData.user?.id;
+        if (!uid) return null;
+        const { data: ngos } = await supabase.from("ngos").select("id,name,status").eq("created_by", uid).limit(1);
+        const myNgo = (ngos ?? [])[0] ?? null;
+        if (!myNgo) return null;
+        const { data: pr } = await supabase.from("projects").select("id,title,description,status,provincia,remote,hours_per_week").eq("ngo_id", myNgo.id).order("created_at", { ascending: false });
+        const projectRows = (pr ?? []) as Project[];
+        const ids = projectRows.map((p) => p.id);
+        let appRows: Application[] = [];
+        if (ids.length) {
+          const { data: ap } = await supabase.from("applications").select("id,status,project_id,volunteer_id").in("project_id", ids);
+          const rows = ap ?? [];
+          const volIds = Array.from(new Set(rows.map((r) => r.volunteer_id)));
+          const { data: profs } = volIds.length
+            ? await supabase.from("profiles").select("id,full_name,portfolio_url,provincia,skills").in("id", volIds)
+            : { data: [] as any[] };
+          const byId = new Map((profs ?? []).map((p) => [p.id, p]));
+          appRows = rows.map((r) => ({
+            id: r.id, status: r.status, project_id: r.project_id,
+            volunteer: (byId.get(r.volunteer_id) as Application["volunteer"]) ?? null,
+          }));
+        }
+        return { myNgo, projectRows, appRows };
+      })();
+
+      const res = await Promise.race([work, timeout]);
+      if (res === "timeout" || res === null) {
+        enterDemo();
+      } else {
+        setNgo(res.myNgo);
+        setProjects(res.projectRows);
+        setApps(res.appRows);
       }
+    } catch {
+      enterDemo();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
   const decide = async (id: string, status: "aprovado" | "rejeitado") => {
     const app = apps.find((x) => x.id === id);
+    if (demo) {
+      setApps((prev) => prev.map((x) => (x.id === id ? { ...x, status } : x)));
+      toast.success(status === "aprovado" ? "Voluntário aprovado (modo demonstração)" : "Candidatura recusada (modo demonstração)");
+      return;
+    }
     const { error } = await supabase.from("applications").update({ status }).eq("id", id);
     if (error) toast.error(error.message);
     else {
@@ -101,6 +141,7 @@ function NgoDashboard() {
     }
   };
 
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -121,8 +162,24 @@ function NgoDashboard() {
           )}
         </div>
 
+        {demo && (
+          <div className="flex items-start justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm">
+            <div className="flex items-start gap-3">
+              <TriangleAlert className="h-4 w-4 mt-0.5 text-amber-600 shrink-0" />
+              <div>
+                <p className="font-medium">Modo demonstração — dados fictícios de segurança</p>
+                <p className="text-muted-foreground">A base de dados está indisponível. As ações abaixo não são gravadas.</p>
+              </div>
+            </div>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className="h-4 w-4 mr-1" /> Tentar novamente
+            </Button>
+          </div>
+        )}
+
         {loading ? (
           <div className="text-sm text-muted-foreground">A carregar…</div>
+
         ) : !ngo ? (
           <Card><CardContent className="p-6 text-sm">Ainda não registou a sua ONG. <Link to="/onboarding" className="text-[color:var(--brand)] underline">Concluir cadastro</Link></CardContent></Card>
         ) : (

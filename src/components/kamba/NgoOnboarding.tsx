@@ -36,6 +36,20 @@ export function NgoOnboarding() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
+          <Label htmlFor="nif">NIF da organização</Label>
+          <Input id="nif" placeholder="Ex: 5417896321" inputMode="numeric" className="mt-1.5" />
+        </div>
+        <div>
+          <Label htmlFor="ngo-phone">Telefone de contacto</Label>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="rounded-md border bg-[color:var(--surface)] px-3 py-2 text-sm text-muted-foreground">+244</span>
+            <Input id="ngo-phone" placeholder="923 000 111" inputMode="tel" />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
           <Label>Área principal de atuação</Label>
           <Select>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -54,6 +68,7 @@ export function NgoOnboarding() {
           </Select>
         </div>
       </div>
+
 
       <div>
         <Label>Documento oficial (Diário da República / Estatuto)</Label>
