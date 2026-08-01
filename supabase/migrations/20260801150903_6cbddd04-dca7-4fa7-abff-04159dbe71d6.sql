@@ -1,0 +1,2 @@
+ALTER TABLE public.ngos ADD COLUMN IF NOT EXISTS nif text;
+ALTER TABLE public.ngos ADD COLUMN IF NOT EXISTS phone text;
