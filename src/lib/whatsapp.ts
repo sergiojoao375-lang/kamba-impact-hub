@@ -17,7 +17,7 @@
  *      `notifyMatch` / `notifyApproved` abaixo.
  */
 
-export type WhatsAppTemplate = "new_match" | "approved" | "otp";
+export type WhatsAppTemplate = "new_match" | "approved" | "otp" | "ngo_approved";
 
 interface SendArgs {
   phone: string; // formato E.164 sem "+", ex.: 244923456789
