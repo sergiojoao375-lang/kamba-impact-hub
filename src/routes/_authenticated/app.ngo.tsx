@@ -162,8 +162,24 @@ function NgoDashboard() {
           )}
         </div>
 
+        {demo && (
+          <div className="flex items-start justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm">
+            <div className="flex items-start gap-3">
+              <TriangleAlert className="h-4 w-4 mt-0.5 text-amber-600 shrink-0" />
+              <div>
+                <p className="font-medium">Modo demonstração — dados fictícios de segurança</p>
+                <p className="text-muted-foreground">A base de dados está indisponível. As ações abaixo não são gravadas.</p>
+              </div>
+            </div>
+            <Button size="sm" variant="outline" onClick={load}>
+              <RefreshCw className="h-4 w-4 mr-1" /> Tentar novamente
+            </Button>
+          </div>
+        )}
+
         {loading ? (
           <div className="text-sm text-muted-foreground">A carregar…</div>
+
         ) : !ngo ? (
           <Card><CardContent className="p-6 text-sm">Ainda não registou a sua ONG. <Link to="/onboarding" className="text-[color:var(--brand)] underline">Concluir cadastro</Link></CardContent></Card>
         ) : (
