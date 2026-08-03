@@ -5,10 +5,11 @@ export type CertificateInput = {
   projectTitle: string;
   ngoName: string;
   hours: number;
+  skills?: string[];
   issuedAt?: Date;
 };
 
-export function generateCertificate({ volunteerName, projectTitle, ngoName, hours, issuedAt = new Date() }: CertificateInput) {
+export function generateCertificate({ volunteerName, projectTitle, ngoName, hours, skills, issuedAt = new Date() }: CertificateInput) {
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
   const w = doc.internal.pageSize.getWidth();
   const h = doc.internal.pageSize.getHeight();
