@@ -157,7 +157,15 @@ function NgoDashboard() {
               <DialogTrigger asChild>
                 <Button className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"><Plus className="h-4 w-4 mr-2" /> Publicar Nova Vaga</Button>
               </DialogTrigger>
-              <NewProjectDialog ngoId={ngo.id} onCreated={() => { setOpen(false); load(); }} />
+              <NewProjectDialog
+                ngoId={ngo.id}
+                demo={demo}
+                onCreated={(p) => {
+                  setOpen(false);
+                  if (demo && p) setProjects((prev) => [p, ...prev]);
+                  else load();
+                }}
+              />
             </Dialog>
           )}
         </div>
@@ -252,7 +260,7 @@ function NgoDashboard() {
   );
 }
 
-function NewProjectDialog({ ngoId, onCreated }: { ngoId: string; onCreated: () => void }) {
+function NewProjectDialog({ ngoId, demo, onCreated }: { ngoId: string; demo?: boolean; onCreated: (p?: Project) => void }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
@@ -264,16 +272,44 @@ function NewProjectDialog({ ngoId, onCreated }: { ngoId: string; onCreated: () =
 
   const toggleSkill = (s: string) => setSkills((cur) => cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s]);
 
+  const reset = () => { setTitle(""); setDescription(""); setSkills([]); setRemote(false); setHours(5); setWeeks(4); };
+
   const submit = async () => {
     if (!title.trim() || !description.trim()) { toast.error("Preencha título e descrição"); return; }
+    if (!remote && !provincia) { toast.error("Selecione a província ou marque como remoto"); return; }
+    if (hours < 1 || weeks < 1) { toast.error("Horas e duração devem ser maiores que zero"); return; }
+
+    const newProject: Project = {
+      id: `demo-p${Date.now()}`,
+      title: title.trim(),
+      description: description.trim(),
+      status: "aberto",
+      provincia: remote ? null : provincia,
+      remote,
+      hours_per_week: hours,
+    };
+
+    if (demo) {
+      toast.success("Vaga publicada (modo demonstração)");
+      reset();
+      onCreated(newProject);
+      return;
+    }
+
     setSaving(true);
     const { data: userData } = await supabase.auth.getUser();
     const uid = userData.user?.id;
-    if (!uid) { toast.error("Sessão expirou"); setSaving(false); return; }
+    if (!uid) {
+      setSaving(false);
+      toast.success("Vaga publicada (modo demonstração)");
+      reset();
+      onCreated(newProject);
+      return;
+    }
     const { error } = await supabase.from("projects").insert({
       ngo_id: ngoId,
       created_by: uid,
-      title, description, skills,
+      title: newProject.title, description: newProject.description, skills,
       provincia: remote ? null : provincia,
       remote,
       hours_per_week: hours,
@@ -281,8 +317,9 @@ function NewProjectDialog({ ngoId, onCreated }: { ngoId: string; onCreated: () =
     });
     setSaving(false);
     if (error) toast.error(error.message);
-    else { toast.success("Vaga publicada"); onCreated(); }
+    else { toast.success("Vaga publicada"); reset(); onCreated(); }
   };
+
 
   return (
     <DialogContent className="max-w-lg">
