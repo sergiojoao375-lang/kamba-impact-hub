@@ -120,11 +120,12 @@ function VolunteerProfile() {
                             size="sm"
                             variant="outline"
                             disabled={r.hours === 0}
-                            onClick={() => generateCertificate({
+                            onClick={() => setCert({
                               volunteerName: p.full_name ?? "Voluntário",
                               projectTitle: r.project_title,
                               ngoName: r.ngo_name,
                               hours: r.hours,
+                              skills: p.skills ?? undefined,
                             })}
                           >
                             <Download className="h-4 w-4 mr-1.5" /> Certificado
