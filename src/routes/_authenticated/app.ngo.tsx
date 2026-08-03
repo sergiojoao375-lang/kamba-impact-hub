@@ -157,7 +157,15 @@ function NgoDashboard() {
               <DialogTrigger asChild>
                 <Button className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"><Plus className="h-4 w-4 mr-2" /> Publicar Nova Vaga</Button>
               </DialogTrigger>
-              <NewProjectDialog ngoId={ngo.id} onCreated={() => { setOpen(false); load(); }} />
+              <NewProjectDialog
+                ngoId={ngo.id}
+                demo={demo}
+                onCreated={(p) => {
+                  setOpen(false);
+                  if (demo && p) setProjects((prev) => [p, ...prev]);
+                  else load();
+                }}
+              />
             </Dialog>
           )}
         </div>
