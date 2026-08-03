@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, Download, ExternalLink, MapPin } from "lucide-react";
-import { generateCertificate } from "@/lib/certificate";
+import { CertificateModal, type CertificateData } from "@/components/kamba/CertificateModal";
 
 export const Route = createFileRoute("/volunteer/$userId")({
   head: () => ({
@@ -29,6 +29,7 @@ function VolunteerProfile() {
   const [p, setP] = useState<Profile | null>(null);
   const [projects, setProjects] = useState<Completed[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cert, setCert] = useState<CertificateData | null>(null);
 
   useEffect(() => {
     (async () => {
