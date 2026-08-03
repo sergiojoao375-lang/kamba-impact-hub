@@ -141,6 +141,7 @@ function VolunteerProfile() {
         )}
       </main>
       <Footer />
+      <CertificateModal open={!!cert} onOpenChange={(v) => !v && setCert(null)} data={cert} />
     </div>
   );
 }
