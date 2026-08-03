@@ -5,10 +5,11 @@ export type CertificateInput = {
   projectTitle: string;
   ngoName: string;
   hours: number;
+  skills?: string[];
   issuedAt?: Date;
 };
 
-export function generateCertificate({ volunteerName, projectTitle, ngoName, hours, issuedAt = new Date() }: CertificateInput) {
+export function generateCertificate({ volunteerName, projectTitle, ngoName, hours, skills, issuedAt = new Date() }: CertificateInput) {
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
   const w = doc.internal.pageSize.getWidth();
   const h = doc.internal.pageSize.getHeight();
@@ -53,7 +54,12 @@ export function generateCertificate({ volunteerName, projectTitle, ngoName, hour
   doc.setFont("helvetica", "normal");
   doc.setFontSize(13);
   doc.setTextColor(60, 60, 60);
-  doc.text(`em parceria com ${ngoName}, em conformidade com a Lei n.º 17/21.`, w / 2, 350, { align: "center" });
+  if (skills?.length) {
+    doc.text(`Competências aplicadas: ${skills.slice(0, 4).join(" · ")}`, w / 2, 348, { align: "center" });
+    doc.text(`em parceria com ${ngoName}, em conformidade com a Lei n.º 17/21.`, w / 2, 372, { align: "center" });
+  } else {
+    doc.text(`em parceria com ${ngoName}, em conformidade com a Lei n.º 17/21.`, w / 2, 350, { align: "center" });
+  }
 
   const dt = issuedAt.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   doc.setFontSize(11);

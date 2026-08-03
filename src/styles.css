@@ -78,3 +78,19 @@
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
 }
+
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body * { visibility: hidden !important; }
+  .print-certificate, .print-certificate * { visibility: visible !important; }
+  .print-certificate {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+}

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, Download, ExternalLink, MapPin } from "lucide-react";
-import { generateCertificate } from "@/lib/certificate";
+import { CertificateModal, type CertificateData } from "@/components/kamba/CertificateModal";
 
 export const Route = createFileRoute("/volunteer/$userId")({
   head: () => ({
@@ -29,6 +29,7 @@ function VolunteerProfile() {
   const [p, setP] = useState<Profile | null>(null);
   const [projects, setProjects] = useState<Completed[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cert, setCert] = useState<CertificateData | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -119,11 +120,12 @@ function VolunteerProfile() {
                             size="sm"
                             variant="outline"
                             disabled={r.hours === 0}
-                            onClick={() => generateCertificate({
+                            onClick={() => setCert({
                               volunteerName: p.full_name ?? "Voluntário",
                               projectTitle: r.project_title,
                               ngoName: r.ngo_name,
                               hours: r.hours,
+                              skills: p.skills ?? undefined,
                             })}
                           >
                             <Download className="h-4 w-4 mr-1.5" /> Certificado
@@ -139,6 +141,7 @@ function VolunteerProfile() {
         )}
       </main>
       <Footer />
+      <CertificateModal open={!!cert} onOpenChange={(v) => !v && setCert(null)} data={cert} />
     </div>
   );
 }
