@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Download, Loader2 } from "lucide-react";
@@ -23,6 +23,20 @@ function refCode(d: CertificateData) {
   for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) >>> 0;
   return `KS-${String(h).slice(0, 8).padStart(8, "0")}`;
 }
+
+export function buildVerifyUrl(d: CertificateData, origin: string) {
+  const issued = d.issuedAt ?? new Date();
+  const q = new URLSearchParams({
+    n: d.volunteerName,
+    h: String(d.hours),
+    o: d.ngoName,
+    p: d.projectTitle,
+    d: issued.toISOString().slice(0, 10),
+  });
+  if (d.skills?.length) q.set("s", d.skills.slice(0, 4).join(","));
+  return `${origin}/verify/${refCode(d)}?${q.toString()}`;
+}
+
 
 export function CertificateModal({
   open,
