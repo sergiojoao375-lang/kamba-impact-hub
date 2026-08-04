@@ -1,7 +1,10 @@
+import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download } from "lucide-react";
-import { generateCertificate } from "@/lib/certificate";
+import { Printer, Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { exportCertificateElement } from "@/lib/certificate-export";
+
 
 export type CertificateData = {
   volunteerName: string;
@@ -30,10 +33,30 @@ export function CertificateModal({
   onOpenChange: (v: boolean) => void;
   data: CertificateData | null;
 }) {
+  const certRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
+
   if (!data) return null;
   const issued = data.issuedAt ?? new Date();
   const dt = issued.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   const competencia = data.skills?.length ? data.skills.slice(0, 4).join(" · ") : "Voluntariado de competências";
+
+  async function handleExport() {
+    if (!certRef.current || !data) return;
+    setExporting(true);
+    try {
+      await exportCertificateElement(
+        certRef.current,
+        `certificado-${data.volunteerName.replace(/\s+/g, "-").toLowerCase()}.pdf`,
+      );
+      toast.success("Certificado guardado em PDF.");
+    } catch {
+      toast.error("Não foi possível gerar o PDF. Tente novamente.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,7 +67,7 @@ export function CertificateModal({
         </DialogDescription>
 
         <div className="p-4 md:p-6 print-certificate-wrap">
-          <div className="print-certificate mx-auto w-full aspect-[1.414/1] bg-card text-foreground relative">
+          <div ref={certRef} className="print-certificate mx-auto w-full aspect-[1.414/1] bg-card text-foreground relative">
             {/* Moldura dupla */}
             <div className="absolute inset-[1.5%] border-[3px] border-[color:var(--brand)]" />
             <div className="absolute inset-[3%] border border-[color:var(--impact)]/50" />
@@ -106,13 +129,15 @@ export function CertificateModal({
         </div>
 
         <div className="flex flex-wrap justify-end gap-2 border-t px-4 py-3 print:hidden">
-          <Button variant="outline" onClick={() => generateCertificate(data)}>
-            <Download className="h-4 w-4 mr-1.5" /> Descarregar PDF
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="h-4 w-4 mr-1.5" /> Imprimir
           </Button>
-          <Button onClick={() => window.print()}>
-            <Printer className="h-4 w-4 mr-1.5" /> Imprimir / Guardar em PDF
+          <Button onClick={handleExport} disabled={exporting}>
+            {exporting ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Download className="h-4 w-4 mr-1.5" />}
+            {exporting ? "A gerar…" : "Guardar em PDF"}
           </Button>
         </div>
+
       </DialogContent>
     </Dialog>
   );
