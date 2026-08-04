@@ -7,23 +7,26 @@ const REF_WIDTH = 1123; // A4 landscape @96dpi
 export async function exportCertificateElement(el: HTMLElement, filename: string) {
   const { default: html2canvas } = await import("html2canvas-pro");
 
-  const rect = el.getBoundingClientRect();
-  // Captura sempre à largura de referência A4 (independente do ecrã), a 2x
-  const scale = Math.max(1, (REF_WIDTH / Math.max(rect.width, 1))) * 2;
+  const REF_HEIGHT = Math.round(REF_WIDTH / 1.414);
 
   const canvas = await html2canvas(el, {
-    scale,
+    scale: 2,
+    width: REF_WIDTH,
+    height: REF_HEIGHT,
+    windowWidth: REF_WIDTH,
+    windowHeight: REF_HEIGHT,
     backgroundColor: "#ffffff",
     useCORS: true,
     logging: false,
-    windowWidth: REF_WIDTH,
     onclone: (_doc, node) => {
       const n = node as HTMLElement;
       n.style.width = `${REF_WIDTH}px`;
+      n.style.height = `${REF_HEIGHT}px`;
       n.style.maxWidth = "none";
       n.style.margin = "0";
     },
   });
+
 
 
   const img = canvas.toDataURL("image/jpeg", 0.95);
