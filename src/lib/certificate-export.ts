@@ -8,8 +8,8 @@ export async function exportCertificateElement(el: HTMLElement, filename: string
   const { default: html2canvas } = await import("html2canvas-pro");
 
   const rect = el.getBoundingClientRect();
-  // Escala relativa à largura de referência para qualidade igual em qualquer ecrã
-  const scale = Math.min(4, Math.max(2, (REF_WIDTH / Math.max(rect.width, 1)) * 2));
+  // Captura sempre à largura de referência A4 (independente do ecrã), a 2x
+  const scale = Math.max(1, (REF_WIDTH / Math.max(rect.width, 1))) * 2;
 
   const canvas = await html2canvas(el, {
     scale,
@@ -17,7 +17,14 @@ export async function exportCertificateElement(el: HTMLElement, filename: string
     useCORS: true,
     logging: false,
     windowWidth: REF_WIDTH,
+    onclone: (_doc, node) => {
+      const n = node as HTMLElement;
+      n.style.width = `${REF_WIDTH}px`;
+      n.style.maxWidth = "none";
+      n.style.margin = "0";
+    },
   });
+
 
   const img = canvas.toDataURL("image/jpeg", 0.95);
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
