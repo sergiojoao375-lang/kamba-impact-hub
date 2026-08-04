@@ -1,7 +1,10 @@
+import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download } from "lucide-react";
-import { generateCertificate } from "@/lib/certificate";
+import { Printer, Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { exportCertificateElement } from "@/lib/certificate-export";
+
 
 export type CertificateData = {
   volunteerName: string;
