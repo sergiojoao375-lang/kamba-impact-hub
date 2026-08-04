@@ -67,7 +67,7 @@ export function CertificateModal({
         </DialogDescription>
 
         <div className="p-4 md:p-6 print-certificate-wrap">
-          <div className="print-certificate mx-auto w-full aspect-[1.414/1] bg-card text-foreground relative">
+          <div ref={certRef} className="print-certificate mx-auto w-full aspect-[1.414/1] bg-card text-foreground relative">
             {/* Moldura dupla */}
             <div className="absolute inset-[1.5%] border-[3px] border-[color:var(--brand)]" />
             <div className="absolute inset-[3%] border border-[color:var(--impact)]/50" />
