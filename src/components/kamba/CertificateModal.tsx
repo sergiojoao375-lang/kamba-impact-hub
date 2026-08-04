@@ -139,8 +139,25 @@ export function CertificateModal({
               </p>
 
               <div className="mt-auto w-full">
-                <div className="flex items-end justify-center">
-                  <div className="w-[46%]">
+                <div className="flex items-end justify-between gap-4">
+                  <div className="flex items-center gap-2 text-left">
+                    {qr ? (
+                      <img
+                        src={qr}
+                        alt={`QR de verificação do certificado ${refCode(data)}`}
+                        className="h-[clamp(2.6rem,7vw,4.6rem)] w-[clamp(2.6rem,7vw,4.6rem)]"
+                      />
+                    ) : (
+                      <div className="h-[clamp(2.6rem,7vw,4.6rem)] w-[clamp(2.6rem,7vw,4.6rem)] border border-border" />
+                    )}
+                    <p className="max-w-[10rem] text-[clamp(0.4rem,0.68vw,0.58rem)] leading-snug text-muted-foreground">
+                      Verificação rápida
+                      <br />
+                      Digitalize para validar em kambasocial
+                    </p>
+                  </div>
+
+                  <div className="w-[42%]">
                     <div className="h-px w-full bg-border" />
                     <p className="mt-1 text-[clamp(0.5rem,0.85vw,0.72rem)] font-medium">Kamba Social</p>
                     <p className="text-[clamp(0.45rem,0.75vw,0.65rem)] text-muted-foreground">
@@ -148,6 +165,7 @@ export function CertificateModal({
                     </p>
                   </div>
                 </div>
+
 
                 <div className="mt-[3%] flex items-center justify-between text-[clamp(0.45rem,0.72vw,0.62rem)] text-muted-foreground">
                   <span>Ref. {refCode(data)}</span>
