@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VolunteerUserIdRouteImport } from './routes/volunteer.$userId'
+import { Route as VerifyRefRouteImport } from './routes/verify.$ref'
 import { Route as AuthenticatedAppNgoRouteImport } from './routes/_authenticated/app.ngo'
 import { Route as AuthenticatedAppFeedRouteImport } from './routes/_authenticated/app.feed'
 import { Route as AuthenticatedAppEsgRouteImport } from './routes/_authenticated/app.esg'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const VolunteerUserIdRoute = VolunteerUserIdRouteImport.update({
   id: '/volunteer/$userId',
   path: '/volunteer/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRefRoute = VerifyRefRouteImport.update({
+  id: '/verify/$ref',
+  path: '/verify/$ref',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppNgoRoute = AuthenticatedAppNgoRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/verify/$ref': typeof VerifyRefRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/app/admin': typeof AuthenticatedAppAdminRoute
   '/app/esg': typeof AuthenticatedAppEsgRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/verify/$ref': typeof VerifyRefRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/app/admin': typeof AuthenticatedAppAdminRoute
   '/app/esg': typeof AuthenticatedAppEsgRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/verify/$ref': typeof VerifyRefRoute
   '/volunteer/$userId': typeof VolunteerUserIdRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRoute
   '/_authenticated/app/esg': typeof AuthenticatedAppEsgRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/verify/$ref'
     | '/volunteer/$userId'
     | '/app/admin'
     | '/app/esg'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/verify/$ref'
     | '/volunteer/$userId'
     | '/app/admin'
     | '/app/esg'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/onboarding'
+    | '/verify/$ref'
     | '/volunteer/$userId'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/esg'
@@ -148,6 +160,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   OnboardingRoute: typeof OnboardingRoute
+  VerifyRefRoute: typeof VerifyRefRoute
   VolunteerUserIdRoute: typeof VolunteerUserIdRoute
 }
 
@@ -186,6 +199,13 @@ declare module '@tanstack/react-router' {
       path: '/volunteer/$userId'
       fullPath: '/volunteer/$userId'
       preLoaderRoute: typeof VolunteerUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$ref': {
+      id: '/verify/$ref'
+      path: '/verify/$ref'
+      fullPath: '/verify/$ref'
+      preLoaderRoute: typeof VerifyRefRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/ngo': {
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   OnboardingRoute: OnboardingRoute,
+  VerifyRefRoute: VerifyRefRoute,
   VolunteerUserIdRoute: VolunteerUserIdRoute,
 }
 export const routeTree = rootRouteImport

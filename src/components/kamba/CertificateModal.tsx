@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Download, Loader2 } from "lucide-react";
@@ -24,6 +24,20 @@ function refCode(d: CertificateData) {
   return `KS-${String(h).slice(0, 8).padStart(8, "0")}`;
 }
 
+export function buildVerifyUrl(d: CertificateData, origin: string) {
+  const issued = d.issuedAt ?? new Date();
+  const q = new URLSearchParams({
+    n: d.volunteerName,
+    h: String(d.hours),
+    o: d.ngoName,
+    p: d.projectTitle,
+    d: issued.toISOString().slice(0, 10),
+  });
+  if (d.skills?.length) q.set("s", d.skills.slice(0, 4).join(","));
+  return `${origin}/verify/${refCode(d)}?${q.toString()}`;
+}
+
+
 export function CertificateModal({
   open,
   onOpenChange,
@@ -35,8 +49,28 @@ export function CertificateModal({
 }) {
   const certRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
+  const [qr, setQr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!data || !open) return;
+    let alive = true;
+    (async () => {
+      try {
+        const QR = (await import("qrcode")).default;
+        const url = buildVerifyUrl(data, window.location.origin);
+        const png = await QR.toDataURL(url, { margin: 0, width: 320, errorCorrectionLevel: "M" });
+        if (alive) setQr(png);
+      } catch {
+        if (alive) setQr(null);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [data, open]);
 
   if (!data) return null;
+
   const issued = data.issuedAt ?? new Date();
   const dt = issued.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   const competencia = data.skills?.length ? data.skills.slice(0, 4).join(" · ") : "Voluntariado de competências";
@@ -105,8 +139,25 @@ export function CertificateModal({
               </p>
 
               <div className="mt-auto w-full">
-                <div className="flex items-end justify-center">
-                  <div className="w-[46%]">
+                <div className="flex items-end justify-between gap-4">
+                  <div className="flex items-center gap-2 text-left">
+                    {qr ? (
+                      <img
+                        src={qr}
+                        alt={`QR de verificação do certificado ${refCode(data)}`}
+                        className="h-[clamp(2.6rem,7vw,4.6rem)] w-[clamp(2.6rem,7vw,4.6rem)]"
+                      />
+                    ) : (
+                      <div className="h-[clamp(2.6rem,7vw,4.6rem)] w-[clamp(2.6rem,7vw,4.6rem)] border border-border" />
+                    )}
+                    <p className="max-w-[10rem] text-[clamp(0.4rem,0.68vw,0.58rem)] leading-snug text-muted-foreground">
+                      Verificação rápida
+                      <br />
+                      Digitalize para validar em kambasocial
+                    </p>
+                  </div>
+
+                  <div className="w-[42%]">
                     <div className="h-px w-full bg-border" />
                     <p className="mt-1 text-[clamp(0.5rem,0.85vw,0.72rem)] font-medium">Kamba Social</p>
                     <p className="text-[clamp(0.45rem,0.75vw,0.65rem)] text-muted-foreground">
@@ -114,6 +165,7 @@ export function CertificateModal({
                     </p>
                   </div>
                 </div>
+
 
                 <div className="mt-[3%] flex items-center justify-between text-[clamp(0.45rem,0.72vw,0.62rem)] text-muted-foreground">
                   <span>Ref. {refCode(data)}</span>
