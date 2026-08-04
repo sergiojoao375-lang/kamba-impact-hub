@@ -33,10 +33,30 @@ export function CertificateModal({
   onOpenChange: (v: boolean) => void;
   data: CertificateData | null;
 }) {
+  const certRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
+
   if (!data) return null;
   const issued = data.issuedAt ?? new Date();
   const dt = issued.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   const competencia = data.skills?.length ? data.skills.slice(0, 4).join(" · ") : "Voluntariado de competências";
+
+  async function handleExport() {
+    if (!certRef.current || !data) return;
+    setExporting(true);
+    try {
+      await exportCertificateElement(
+        certRef.current,
+        `certificado-${data.volunteerName.replace(/\s+/g, "-").toLowerCase()}.pdf`,
+      );
+      toast.success("Certificado guardado em PDF.");
+    } catch {
+      toast.error("Não foi possível gerar o PDF. Tente novamente.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
