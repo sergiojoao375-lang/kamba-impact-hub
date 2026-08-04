@@ -49,8 +49,28 @@ export function CertificateModal({
 }) {
   const certRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
+  const [qr, setQr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!data || !open) return;
+    let alive = true;
+    (async () => {
+      try {
+        const QR = (await import("qrcode")).default;
+        const url = buildVerifyUrl(data, window.location.origin);
+        const png = await QR.toDataURL(url, { margin: 0, width: 320, errorCorrectionLevel: "M" });
+        if (alive) setQr(png);
+      } catch {
+        if (alive) setQr(null);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [data, open]);
 
   if (!data) return null;
+
   const issued = data.issuedAt ?? new Date();
   const dt = issued.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   const competencia = data.skills?.length ? data.skills.slice(0, 4).join(" · ") : "Voluntariado de competências";
