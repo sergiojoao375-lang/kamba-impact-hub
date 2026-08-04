@@ -129,13 +129,15 @@ export function CertificateModal({
         </div>
 
         <div className="flex flex-wrap justify-end gap-2 border-t px-4 py-3 print:hidden">
-          <Button variant="outline" onClick={() => generateCertificate(data)}>
-            <Download className="h-4 w-4 mr-1.5" /> Descarregar PDF
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer className="h-4 w-4 mr-1.5" /> Imprimir
           </Button>
-          <Button onClick={() => window.print()}>
-            <Printer className="h-4 w-4 mr-1.5" /> Imprimir / Guardar em PDF
+          <Button onClick={handleExport} disabled={exporting}>
+            {exporting ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Download className="h-4 w-4 mr-1.5" />}
+            {exporting ? "A gerar…" : "Guardar em PDF"}
           </Button>
         </div>
+
       </DialogContent>
     </Dialog>
   );
