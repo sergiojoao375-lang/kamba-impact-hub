@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VolunteerUserIdRouteImport } from './routes/volunteer.$userId'
 import { Route as VerifyRefRouteImport } from './routes/verify.$ref'
+import { Route as AuthenticatedAppTestCertificateRouteImport } from './routes/_authenticated/app.test-certificate'
 import { Route as AuthenticatedAppNgoRouteImport } from './routes/_authenticated/app.ngo'
 import { Route as AuthenticatedAppFeedRouteImport } from './routes/_authenticated/app.feed'
 import { Route as AuthenticatedAppEsgRouteImport } from './routes/_authenticated/app.esg'
@@ -50,6 +51,12 @@ const VerifyRefRoute = VerifyRefRouteImport.update({
   path: '/verify/$ref',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppTestCertificateRoute =
+  AuthenticatedAppTestCertificateRouteImport.update({
+    id: '/app/test-certificate',
+    path: '/app/test-certificate',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppNgoRoute = AuthenticatedAppNgoRouteImport.update({
   id: '/app/ngo',
   path: '/app/ngo',
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/app/esg': typeof AuthenticatedAppEsgRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/app/test-certificate': typeof AuthenticatedAppTestCertificateRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRoutesByTo {
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/app/esg': typeof AuthenticatedAppEsgRoute
   '/app/feed': typeof AuthenticatedAppFeedRoute
   '/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/app/test-certificate': typeof AuthenticatedAppTestCertificateRoute
   '/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRoutesById {
@@ -113,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated/app/esg': typeof AuthenticatedAppEsgRoute
   '/_authenticated/app/feed': typeof AuthenticatedAppFeedRoute
   '/_authenticated/app/ngo': typeof AuthenticatedAppNgoRoute
+  '/_authenticated/app/test-certificate': typeof AuthenticatedAppTestCertificateRoute
   '/_authenticated/app/project/$projectId': typeof AuthenticatedAppProjectProjectIdRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/app/esg'
     | '/app/feed'
     | '/app/ngo'
+    | '/app/test-certificate'
     | '/app/project/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/app/esg'
     | '/app/feed'
     | '/app/ngo'
+    | '/app/test-certificate'
     | '/app/project/$projectId'
   id:
     | '__root__'
@@ -152,6 +164,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/esg'
     | '/_authenticated/app/feed'
     | '/_authenticated/app/ngo'
+    | '/_authenticated/app/test-certificate'
     | '/_authenticated/app/project/$projectId'
   fileRoutesById: FileRoutesById
 }
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyRefRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app/test-certificate': {
+      id: '/_authenticated/app/test-certificate'
+      path: '/app/test-certificate'
+      fullPath: '/app/test-certificate'
+      preLoaderRoute: typeof AuthenticatedAppTestCertificateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/ngo': {
       id: '/_authenticated/app/ngo'
       path: '/app/ngo'
@@ -251,6 +271,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppEsgRoute: typeof AuthenticatedAppEsgRoute
   AuthenticatedAppFeedRoute: typeof AuthenticatedAppFeedRoute
   AuthenticatedAppNgoRoute: typeof AuthenticatedAppNgoRoute
+  AuthenticatedAppTestCertificateRoute: typeof AuthenticatedAppTestCertificateRoute
   AuthenticatedAppProjectProjectIdRoute: typeof AuthenticatedAppProjectProjectIdRoute
 }
 
@@ -259,6 +280,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppEsgRoute: AuthenticatedAppEsgRoute,
   AuthenticatedAppFeedRoute: AuthenticatedAppFeedRoute,
   AuthenticatedAppNgoRoute: AuthenticatedAppNgoRoute,
+  AuthenticatedAppTestCertificateRoute: AuthenticatedAppTestCertificateRoute,
   AuthenticatedAppProjectProjectIdRoute: AuthenticatedAppProjectProjectIdRoute,
 }
 
@@ -276,13 +298,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

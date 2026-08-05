@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2 } from "lucide-react";
+import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { NotificationsBell } from "./NotificationsBell";
 
