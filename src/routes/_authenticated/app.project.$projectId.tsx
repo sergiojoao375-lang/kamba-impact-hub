@@ -94,6 +94,10 @@ function ProjectRoom() {
   };
 
   useEffect(() => { load(); }, [projectId]);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null));
+  }, []);
+
 
   const addTask = async (col: Task["column_name"]) => {
     const title = (newTitle[col] ?? "").trim();
