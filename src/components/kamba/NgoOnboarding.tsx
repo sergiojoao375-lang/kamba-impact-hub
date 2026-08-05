@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,12 +13,63 @@ export function NgoOnboarding() {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [name, setName] = useState("");
+  const [nif, setNif] = useState("");
+  const [phone, setPhone] = useState("");
+  const [area, setArea] = useState("");
+  const [provincia, setProvincia] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const submit = () => {
-    toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
-    navigate({ to: "/app/ngo" });
+  const submit = async () => {
+    if (!name.trim() || !area || !provincia) {
+      toast.error("Preencha o nome, a área de atuação e a província");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) {
+        toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
+        navigate({ to: "/app/ngo" });
+        return;
+      }
+
+      const { data: ngo, error } = await supabase
+        .from("ngos")
+        .insert({
+          created_by: uid,
+          name: name.trim(),
+          nif: nif.trim() || null,
+          phone: phone.trim() ? `+244${phone.replace(/\D/g, "")}` : null,
+          area_atuacao: area,
+          provincia,
+        })
+        .select("id")
+        .single();
+      if (error) throw new Error(error.message);
+
+      if (file && ngo) {
+        const ext = file.name.split(".").pop() ?? "pdf";
+        const path = `${uid}/${ngo.id}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("diarios-republica")
+          .upload(path, file, { upsert: true, contentType: file.type || undefined });
+        if (upErr) throw new Error(upErr.message);
+        const { error: updErr } = await supabase.from("ngos").update({ document_url: path }).eq("id", ngo.id);
+        if (updErr) throw new Error(updErr.message);
+      }
+
+      toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
+      navigate({ to: "/app/ngo" });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível enviar o cadastro");
+    } finally {
+      setSaving(false);
+    }
   };
+
 
 
   const onDrop = (e: React.DragEvent) => {
@@ -31,19 +83,19 @@ export function NgoOnboarding() {
     <div className="space-y-6">
       <div>
         <Label htmlFor="org">Nome da organização</Label>
-        <Input id="org" placeholder="Ex: Fundação Kubuka Angola" className="mt-1.5" />
+        <Input id="org" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Fundação Kubuka Angola" className="mt-1.5" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="nif">NIF da organização</Label>
-          <Input id="nif" placeholder="Ex: 5417896321" inputMode="numeric" className="mt-1.5" />
+          <Input id="nif" value={nif} onChange={(e) => setNif(e.target.value)} placeholder="Ex: 5417896321" inputMode="numeric" className="mt-1.5" />
         </div>
         <div>
           <Label htmlFor="ngo-phone">Telefone de contacto</Label>
           <div className="mt-1.5 flex items-center gap-2">
             <span className="rounded-md border bg-[color:var(--surface)] px-3 py-2 text-sm text-muted-foreground">+244</span>
-            <Input id="ngo-phone" placeholder="923 000 111" inputMode="tel" />
+            <Input id="ngo-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="923 000 111" inputMode="tel" />
           </div>
         </div>
       </div>
@@ -51,7 +103,7 @@ export function NgoOnboarding() {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label>Área principal de atuação</Label>
-          <Select>
+          <Select value={area} onValueChange={setArea}>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
               {AREAS_ATUACAO.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
@@ -60,7 +112,7 @@ export function NgoOnboarding() {
         </div>
         <div>
           <Label>Província</Label>
-          <Select>
+          <Select value={provincia} onValueChange={setProvincia}>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
               {PROVINCIAS_ANGOLA.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
@@ -68,6 +120,7 @@ export function NgoOnboarding() {
           </Select>
         </div>
       </div>
+
 
 
       <div>

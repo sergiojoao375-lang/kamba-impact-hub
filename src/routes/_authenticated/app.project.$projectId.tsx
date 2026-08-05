@@ -5,9 +5,15 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { ChatPanel } from "@/components/kamba/ChatPanel";
+import { useServerFn } from "@tanstack/react-start";
+import { finalizeProject } from "@/lib/impact.functions";
+
+const fmtKz = (n: number) =>
+  new Intl.NumberFormat("pt-AO", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n);
+
 
 export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   head: () => ({
@@ -35,8 +41,28 @@ function ProjectRoom() {
   const [newTitle, setNewTitle] = useState<Record<string, string>>({});
   const [dragId, setDragId] = useState<string | null>(null);
   const [memberIds, setMemberIds] = useState<string[]>([]);
+  const [uid, setUid] = useState<string | null>(null);
+  const [finalizing, setFinalizing] = useState(false);
+  const finalizeFn = useServerFn(finalizeProject);
 
   const isDemo = projectId.startsWith("demo-");
+  const isOwner = !isDemo && !!project && !!uid && project.created_by === uid;
+
+  const finalize = async () => {
+    setFinalizing(true);
+    try {
+      const res = await finalizeFn({ data: { projectId } });
+      toast.success(
+        `Projeto concluído · ${res.totalHours} h · Valor Pro Bono ${fmtKz(res.valueKz)}`,
+      );
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível finalizar o projeto");
+    } finally {
+      setFinalizing(false);
+    }
+  };
+
 
   const load = async () => {
     if (isDemo) {
@@ -68,6 +94,10 @@ function ProjectRoom() {
   };
 
   useEffect(() => { load(); }, [projectId]);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null));
+  }, []);
+
 
   const addTask = async (col: Task["column_name"]) => {
     const title = (newTitle[col] ?? "").trim();
@@ -103,13 +133,24 @@ function ProjectRoom() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Link to="/app/ngo"><Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Button></Link>
-          <div>
+          <div className="flex-1 min-w-[200px]">
             <h1 className="text-2xl font-semibold">{project?.title ?? "Sala do projeto"}</h1>
             <p className="text-sm text-muted-foreground">{project?.ngo?.name} · Quadro colaborativo</p>
           </div>
+          {isOwner && (
+            <Button
+              size="sm"
+              onClick={finalize}
+              disabled={finalizing}
+              className="bg-[color:var(--impact)] hover:bg-[color:var(--impact)]/90 text-[color:var(--impact-foreground)]"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-1" /> {finalizing ? "A calcular…" : "Concluir projeto"}
+            </Button>
+          )}
         </div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {COLUMNS.map((col) => {

@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
-import { Plus, Check, X, ExternalLink, KanbanSquare, TriangleAlert, RefreshCw } from "lucide-react";
+import { Plus, Check, X, ExternalLink, KanbanSquare, TriangleAlert, RefreshCw, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { notify } from "@/components/kamba/NotificationsBell";
 import { notifyApproved } from "@/lib/whatsapp";
@@ -152,7 +152,7 @@ function NgoDashboard() {
               {ngo ? <>Organização: <span className="font-medium text-foreground">{ngo.name}</span> · Status: <Badge variant={ngo.status === "aprovado" ? "default" : "secondary"}>{ngo.status}</Badge></> : "Complete o cadastro da sua ONG para começar."}
             </p>
           </div>
-          {ngo && (
+          {ngo && ngo.status === "aprovado" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"><Plus className="h-4 w-4 mr-2" /> Publicar Nova Vaga</Button>
@@ -168,7 +168,27 @@ function NgoDashboard() {
               />
             </Dialog>
           )}
+          {ngo && ngo.status !== "aprovado" && (
+            <Button disabled variant="outline" title="Verificação pendente">
+              <Lock className="h-4 w-4 mr-2" /> Publicação bloqueada
+            </Button>
+          )}
         </div>
+
+        {ngo && ngo.status !== "aprovado" && (
+          <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm">
+            <Lock className="h-4 w-4 mt-0.5 shrink-0 text-destructive" />
+            <div>
+              <p className="font-medium">Publicação de vagas bloqueada</p>
+              <p className="text-muted-foreground">
+                A verificação do Diário da República da sua organização está{" "}
+                <strong>{ngo.status}</strong>. Só organizações aprovadas pela equipa Kamba Social podem
+                publicar vagas no feed público — esta regra é aplicada também no servidor.
+              </p>
+            </div>
+          </div>
+        )}
+
 
         {demo && (
           <div className="flex items-start justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm">

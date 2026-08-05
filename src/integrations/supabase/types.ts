@@ -52,6 +52,30 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -165,7 +189,9 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          company_id: string | null
           created_at: string
+          department: string | null
           full_name: string | null
           id: string
           phone: string | null
@@ -177,7 +203,9 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          company_id?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string | null
           id: string
           phone?: string | null
@@ -189,7 +217,9 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          company_id?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string | null
           id?: string
           phone?: string | null
@@ -199,7 +229,82 @@ export type Database = {
           skills?: string[]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_impact: {
+        Row: {
+          closed_at: string
+          company_id: string | null
+          created_at: string
+          hourly_rate_kz: number
+          id: string
+          main_skill: string | null
+          ngo_id: string
+          project_id: string
+          total_hours: number
+          updated_at: string
+          value_kz: number
+          volunteers_count: number
+        }
+        Insert: {
+          closed_at?: string
+          company_id?: string | null
+          created_at?: string
+          hourly_rate_kz?: number
+          id?: string
+          main_skill?: string | null
+          ngo_id: string
+          project_id: string
+          total_hours?: number
+          updated_at?: string
+          value_kz?: number
+          volunteers_count?: number
+        }
+        Update: {
+          closed_at?: string
+          company_id?: string | null
+          created_at?: string
+          hourly_rate_kz?: number
+          id?: string
+          main_skill?: string | null
+          ngo_id?: string
+          project_id?: string
+          total_hours?: number
+          updated_at?: string
+          value_kz?: number
+          volunteers_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_impact_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_impact_ngo_id_fkey"
+            columns: ["ngo_id"]
+            isOneToOne: false
+            referencedRelation: "ngos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_impact_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -256,6 +361,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      skill_rates: {
+        Row: {
+          created_at: string
+          hourly_rate_kz: number
+          skill: string
+        }
+        Insert: {
+          created_at?: string
+          hourly_rate_kz: number
+          skill: string
+        }
+        Update: {
+          created_at?: string
+          hourly_rate_kz?: number
+          skill?: string
+        }
+        Relationships: []
       }
       tasks: {
         Row: {

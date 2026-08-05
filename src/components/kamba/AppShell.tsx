@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2 } from "lucide-react";
+import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { NotificationsBell } from "./NotificationsBell";
 
@@ -43,6 +43,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/app/esg" className="inline-flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted" activeProps={{ className: "bg-muted font-medium" }}>
               <Building2 className="h-4 w-4" /> Portal ESG
             </Link>
+            <Link to="/app/test-certificate" className="inline-flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted" activeProps={{ className: "bg-muted font-medium" }}>
+              <Award className="h-4 w-4" /> Certificado
+            </Link>
+
             {isAdmin && (
               <Link to="/app/admin" className="inline-flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted" activeProps={{ className: "bg-muted font-medium" }}>
                 <ShieldCheck className="h-4 w-4" /> Admin
