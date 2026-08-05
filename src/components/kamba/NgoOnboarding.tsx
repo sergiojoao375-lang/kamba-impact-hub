@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,12 +13,63 @@ export function NgoOnboarding() {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [name, setName] = useState("");
+  const [nif, setNif] = useState("");
+  const [phone, setPhone] = useState("");
+  const [area, setArea] = useState("");
+  const [provincia, setProvincia] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const submit = () => {
-    toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
-    navigate({ to: "/app/ngo" });
+  const submit = async () => {
+    if (!name.trim() || !area || !provincia) {
+      toast.error("Preencha o nome, a área de atuação e a província");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) {
+        toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
+        navigate({ to: "/app/ngo" });
+        return;
+      }
+
+      const { data: ngo, error } = await supabase
+        .from("ngos")
+        .insert({
+          created_by: uid,
+          name: name.trim(),
+          nif: nif.trim() || null,
+          phone: phone.trim() ? `+244${phone.replace(/\D/g, "")}` : null,
+          area_atuacao: area,
+          provincia,
+        })
+        .select("id")
+        .single();
+      if (error) throw new Error(error.message);
+
+      if (file && ngo) {
+        const ext = file.name.split(".").pop() ?? "pdf";
+        const path = `${uid}/${ngo.id}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("diarios-republica")
+          .upload(path, file, { upsert: true, contentType: file.type || undefined });
+        if (upErr) throw new Error(upErr.message);
+        const { error: updErr } = await supabase.from("ngos").update({ document_url: path }).eq("id", ngo.id);
+        if (updErr) throw new Error(updErr.message);
+      }
+
+      toast.success("Cadastro enviado. Aguardando verificação (até 48h).");
+      navigate({ to: "/app/ngo" });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível enviar o cadastro");
+    } finally {
+      setSaving(false);
+    }
   };
+
 
 
   const onDrop = (e: React.DragEvent) => {
