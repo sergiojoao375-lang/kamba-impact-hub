@@ -196,13 +196,23 @@ function AdminPanel() {
                     <TableCell className="text-sm">{n.provincia ?? "—"}</TableCell>
                     <TableCell><Badge variant={statusVariant(n.status)}>{n.status}</Badge></TableCell>
                     <TableCell>
-                      <Button size="sm" variant="ghost" onClick={() => {
-                        if (n.document_url) window.open(n.document_url, "_blank", "noopener");
-                        else setDocNgo(n);
+                      <Button size="sm" variant="ghost" onClick={async () => {
+                        if (n.document_url) {
+                          if (/^https?:\/\//.test(n.document_url)) {
+                            window.open(n.document_url, "_blank", "noopener");
+                            return;
+                          }
+                          const { data, error } = await supabase.storage
+                            .from("diarios-republica")
+                            .createSignedUrl(n.document_url, 300);
+                          if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
+                          else { toast.error(error?.message ?? "Documento indisponível"); setDocNgo(n); }
+                        } else setDocNgo(n);
                       }}>
                         <FileText className="h-4 w-4 mr-1" /> Ver Diário da República
                       </Button>
                     </TableCell>
+
                     <TableCell className="text-right whitespace-nowrap">
                       <div className="inline-flex gap-2">
                         <Button
