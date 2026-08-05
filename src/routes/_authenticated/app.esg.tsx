@@ -60,7 +60,9 @@ const COLABORADORES = [
 const fmtKz = (n: number) =>
   new Intl.NumberFormat("pt-AO", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n);
 
-function exportPdf() {
+type Kpis = typeof KPIS_DEMO;
+
+function exportPdf(KPIS: Kpis) {
   const doc = new jsPDF();
   doc.setFillColor(37, 99, 235);
   doc.rect(0, 0, 210, 28, "F");
@@ -81,6 +83,7 @@ function exportPdf() {
     `Colaboradores Ativos: ${KPIS.colaboradores}`,
     `ONGs Apoiadas: ${KPIS.ongs}`,
   ];
+
   lines.forEach((l, i) => doc.text(l, 14, 66 + i * 8));
 
   doc.setFontSize(14);
