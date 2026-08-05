@@ -5,9 +5,15 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { ChatPanel } from "@/components/kamba/ChatPanel";
+import { useServerFn } from "@tanstack/react-start";
+import { finalizeProject } from "@/lib/impact.functions";
+
+const fmtKz = (n: number) =>
+  new Intl.NumberFormat("pt-AO", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n);
+
 
 export const Route = createFileRoute("/_authenticated/app/project/$projectId")({
   head: () => ({
