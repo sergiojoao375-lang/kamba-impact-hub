@@ -41,8 +41,28 @@ function ProjectRoom() {
   const [newTitle, setNewTitle] = useState<Record<string, string>>({});
   const [dragId, setDragId] = useState<string | null>(null);
   const [memberIds, setMemberIds] = useState<string[]>([]);
+  const [uid, setUid] = useState<string | null>(null);
+  const [finalizing, setFinalizing] = useState(false);
+  const finalizeFn = useServerFn(finalizeProject);
 
   const isDemo = projectId.startsWith("demo-");
+  const isOwner = !isDemo && !!project && !!uid && project.created_by === uid;
+
+  const finalize = async () => {
+    setFinalizing(true);
+    try {
+      const res = await finalizeFn({ data: { projectId } });
+      toast.success(
+        `Projeto concluído · ${res.totalHours} h · Valor Pro Bono ${fmtKz(res.valueKz)}`,
+      );
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível finalizar o projeto");
+    } finally {
+      setFinalizing(false);
+    }
+  };
+
 
   const load = async () => {
     if (isDemo) {
