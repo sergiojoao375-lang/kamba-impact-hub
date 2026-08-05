@@ -122,6 +122,26 @@ function Kpi({ icon: Icon, label, value, hint }: { icon: any; label: string; val
 }
 
 function EsgDashboard() {
+  const [KPIS, setKpis] = useState<Kpis>(KPIS_DEMO);
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("project_impact")
+        .select("total_hours,value_kz,volunteers_count,ngo_id");
+      const rows = data ?? [];
+      if (!rows.length) return;
+      setKpis({
+        valorPro: rows.reduce((s, r) => s + Number(r.value_kz ?? 0), 0),
+        horas: rows.reduce((s, r) => s + Number(r.total_hours ?? 0), 0),
+        colaboradores: rows.reduce((s, r) => s + Number(r.volunteers_count ?? 0), 0),
+        ongs: new Set(rows.map((r) => r.ngo_id)).size,
+      });
+      setLive(true);
+    })();
+  }, []);
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -132,13 +152,14 @@ function EsgDashboard() {
                 <Building2 className="h-3 w-3 mr-1" /> Portal Corporativo
               </Badge>
               <Badge variant="outline">ESG · Balanço Social</Badge>
+              <Badge variant={live ? "default" : "secondary"}>{live ? "Dados reais" : "Demonstração"}</Badge>
             </div>
             <h1 className="mt-2 text-2xl font-semibold">Impacto da sua Empresa</h1>
             <p className="text-sm text-muted-foreground">
               Meça o retorno social do voluntariado corporativo — em Kwanzas, horas e ODS.
             </p>
           </div>
-          <Button onClick={exportPdf} className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90">
+          <Button onClick={() => exportPdf(KPIS)} className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90">
             <Download className="h-4 w-4 mr-2" /> Exportar Relatório ESG (PDF)
           </Button>
         </div>
@@ -149,6 +170,7 @@ function EsgDashboard() {
           <Kpi icon={Users} label="Colaboradores Ativos" value={String(KPIS.colaboradores)} />
           <Kpi icon={HeartHandshake} label="ONGs Apoiadas" value={String(KPIS.ongs)} />
         </div>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
