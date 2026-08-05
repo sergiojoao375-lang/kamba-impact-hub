@@ -24,14 +24,14 @@ export const Route = createFileRoute("/_authenticated/app/esg")({
   component: EsgDashboard,
 });
 
-// Dados de demonstração — em produção, agregar a partir de `applications` + `tasks.hours_logged`
-// para cada empresa parceira registada na tabela `companies` (a criar).
-const KPIS = {
+// KPIs de referência (fallback de demonstração quando ainda não há projetos concluídos).
+const KPIS_DEMO = {
   valorPro: 42_850_000, // Kz
   horas: 3_420,
   colaboradores: 128,
   ongs: 17,
 };
+
 
 const ODS_DATA = [
   { name: "ODS 4 · Educação", value: 38, color: "#C5192D" },
