@@ -83,19 +83,19 @@ export function NgoOnboarding() {
     <div className="space-y-6">
       <div>
         <Label htmlFor="org">Nome da organização</Label>
-        <Input id="org" placeholder="Ex: Fundação Kubuka Angola" className="mt-1.5" />
+        <Input id="org" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Fundação Kubuka Angola" className="mt-1.5" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="nif">NIF da organização</Label>
-          <Input id="nif" placeholder="Ex: 5417896321" inputMode="numeric" className="mt-1.5" />
+          <Input id="nif" value={nif} onChange={(e) => setNif(e.target.value)} placeholder="Ex: 5417896321" inputMode="numeric" className="mt-1.5" />
         </div>
         <div>
           <Label htmlFor="ngo-phone">Telefone de contacto</Label>
           <div className="mt-1.5 flex items-center gap-2">
             <span className="rounded-md border bg-[color:var(--surface)] px-3 py-2 text-sm text-muted-foreground">+244</span>
-            <Input id="ngo-phone" placeholder="923 000 111" inputMode="tel" />
+            <Input id="ngo-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="923 000 111" inputMode="tel" />
           </div>
         </div>
       </div>
@@ -103,7 +103,7 @@ export function NgoOnboarding() {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Label>Área principal de atuação</Label>
-          <Select>
+          <Select value={area} onValueChange={setArea}>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
               {AREAS_ATUACAO.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
@@ -112,7 +112,7 @@ export function NgoOnboarding() {
         </div>
         <div>
           <Label>Província</Label>
-          <Select>
+          <Select value={provincia} onValueChange={setProvincia}>
             <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
               {PROVINCIAS_ANGOLA.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
@@ -120,6 +120,7 @@ export function NgoOnboarding() {
           </Select>
         </div>
       </div>
+
 
 
       <div>
