@@ -179,6 +179,46 @@ function EsgDashboard() {
         </div>
 
 
+        {lite ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-base">Alinhamento com ODS da ONU</CardTitle></CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow><TableHead>Objetivo</TableHead><TableHead className="text-right">Peso</TableHead></TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ODS_DATA.map((o) => (
+                      <TableRow key={o.name}>
+                        <TableCell className="font-medium">{o.name}</TableCell>
+                        <TableCell className="text-right font-semibold">{o.value}%</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle className="text-base">Horas por Departamento</CardTitle></CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow><TableHead>Departamento</TableHead><TableHead className="text-right">Horas</TableHead></TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {DEPT_DATA.map((d) => (
+                      <TableRow key={d.dept}>
+                        <TableCell className="font-medium">{d.dept}</TableCell>
+                        <TableCell className="text-right font-semibold">{d.horas} h</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader><CardTitle className="text-base">Alinhamento com ODS da ONU</CardTitle></CardHeader>
@@ -210,6 +250,11 @@ function EsgDashboard() {
             </CardContent>
           </Card>
         </div>
+        )}
+
+        <TalentPool />
+        <ImpactBadge horas={KPIS.horas} valor={KPIS.valorPro} />
+
 
         <Card>
           <CardHeader>
