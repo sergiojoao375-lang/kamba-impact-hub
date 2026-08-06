@@ -73,6 +73,7 @@ function FeedPage() {
   const [provincia, setProvincia] = useState<string>("all");
   const [skill, setSkill] = useState<string>("all");
   const [q, setQ] = useState("");
+  const [done, setDone] = useState({ projetos: 0, horas: 0 });
 
   useEffect(() => {
     (async () => {
