@@ -300,3 +300,85 @@ function EsgDashboard() {
     </AppShell>
   );
 }
+
+function TalentPool() {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Trophy className="h-4 w-4" /> Banco de Talentos &amp; Estágios
+        </CardTitle>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => toast.success("Vaga de estágio publicada — visível para voluntários elegíveis")}
+        >
+          <GraduationCap className="h-4 w-4 mr-2" /> Publicar Vaga de Estágio
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-10">#</TableHead>
+              <TableHead>Voluntário</TableHead>
+              <TableHead>Província</TableHead>
+              <TableHead>Competência</TableHead>
+              <TableHead>Nível</TableHead>
+              <TableHead className="text-right">Horas</TableHead>
+              <TableHead className="text-right">Pontos</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[...TALENT_POOL].sort((a, b) => b.pontos - a.pontos).map((v, i) => (
+              <TableRow key={v.nome}>
+                <TableCell className="font-semibold text-muted-foreground">{i + 1}</TableCell>
+                <TableCell className="font-medium">{v.nome}</TableCell>
+                <TableCell>{v.provincia}</TableCell>
+                <TableCell>{v.competencia}</TableCell>
+                <TableCell><Badge variant="secondary">{v.nivel}</Badge></TableCell>
+                <TableCell className="text-right">{v.horas} h</TableCell>
+                <TableCell className="text-right font-semibold">{v.pontos}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ImpactBadge({ horas, valor }: { horas: number; valor: number }) {
+  const snippet = `<iframe src="https://kamba-social.lovable.app/selo?horas=${Math.round(horas)}&valor=${Math.round(valor)}" width="320" height="140" style="border:0" title="Selo Digital de Impacto Kamba Social"></iframe>`;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Code2 className="h-4 w-4" /> Selo Digital de Impacto
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="rounded-lg border-2 border-[color:var(--brand)]/30 p-5 bg-card">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Empresa Parceira Kamba Social</p>
+          <p className="mt-2 text-2xl font-semibold">{Math.round(horas).toLocaleString("pt-AO")} h doadas</p>
+          <p className="text-sm text-muted-foreground">{fmtKz(valor)} em valor pro bono</p>
+          <p className="mt-3 text-[10px] text-muted-foreground">Verificado pela plataforma Kamba Social · Angola</p>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Cole este código no site institucional da sua empresa:</p>
+          <Textarea readOnly value={snippet} rows={4} className="font-mono text-xs" />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              navigator.clipboard.writeText(snippet);
+              toast.success("Código do selo copiado");
+            }}
+          >
+            <Copy className="h-4 w-4 mr-2" /> Copiar código
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
