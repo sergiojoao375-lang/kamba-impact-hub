@@ -2,14 +2,20 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award } from "lucide-react";
+import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award, Gauge } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { NotificationsBell } from "./NotificationsBell";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useLiteMode } from "@/lib/lite-mode";
+import { toast } from "sonner";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
+
+  const [lite, setLite] = useLiteMode();
 
   useEffect(() => {
     (async () => {
@@ -54,6 +60,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           </nav>
           <div className="flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-2 rounded-md border px-2 py-1.5 mr-1">
+              <Gauge className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="lite-mode" className="text-xs cursor-pointer">Dados Leves</Label>
+              <Switch
+                id="lite-mode"
+                checked={lite}
+                onCheckedChange={(v) => {
+                  setLite(v);
+                  toast.success(v ? "Modo poupança de dados activado" : "Modo completo activado");
+                }}
+              />
+            </div>
             <NotificationsBell />
             {uid && (
               <Link to="/volunteer/$userId" params={{ userId: uid }}>
