@@ -130,6 +130,7 @@ function Kpi({ icon: Icon, label, value, hint }: { icon: any; label: string; val
 function EsgDashboard() {
   const [KPIS, setKpis] = useState<Kpis>(KPIS_DEMO);
   const [live, setLive] = useState(false);
+  const [lite] = useLiteMode();
 
   useEffect(() => {
     (async () => {
