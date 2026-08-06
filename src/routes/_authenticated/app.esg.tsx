@@ -11,9 +11,12 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer,
   Tooltip, XAxis, YAxis,
 } from "recharts";
-import { Briefcase, Building2, Clock, Coins, Download, HeartHandshake, Users } from "lucide-react";
+import { Briefcase, Building2, Clock, Code2, Coins, Copy, Download, GraduationCap, HeartHandshake, Trophy, Users } from "lucide-react";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { useLiteMode } from "@/lib/lite-mode";
+import { TALENT_POOL } from "@/lib/internships";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/app/esg")({
   head: () => ({
