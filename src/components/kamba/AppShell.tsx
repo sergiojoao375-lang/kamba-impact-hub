@@ -15,6 +15,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
 
+  const [lite, setLite] = useLiteMode();
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getUser();
