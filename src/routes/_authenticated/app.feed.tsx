@@ -88,8 +88,24 @@ function FeedPage() {
       // Demo fallback: sem sessão ou DB vazia → mostrar vagas mockadas.
       setProjects(list.length ? list : DEMO_PROJECTS);
       if (uid) {
-        const { data: apps } = await supabase.from("applications").select("project_id").eq("volunteer_id", uid);
+        const { data: apps } = await supabase
+          .from("applications")
+          .select("project_id,status,project:projects(status)")
+          .eq("volunteer_id", uid);
         setApplied(new Set((apps ?? []).map((a) => a.project_id)));
+        const concluidos = (apps ?? []).filter(
+          (a: any) => a.status === "aprovado" && a.project?.status === "concluido",
+        );
+        if (concluidos.length) {
+          const { data: tks } = await supabase
+            .from("tasks")
+            .select("hours_logged,project_id")
+            .in("project_id", concluidos.map((a: any) => a.project_id));
+          setDone({
+            projetos: concluidos.length,
+            horas: (tks ?? []).reduce((s, t) => s + Number(t.hours_logged ?? 0), 0),
+          });
+        }
         const { data: me } = await supabase.from("profiles").select("phone,skills,provincia").eq("id", uid).maybeSingle();
         if (me?.phone && me.skills?.length) {
           const appliedSet = new Set((apps ?? []).map((a) => a.project_id));
