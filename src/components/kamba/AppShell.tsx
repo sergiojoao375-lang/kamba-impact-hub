@@ -60,6 +60,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           </nav>
           <div className="flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-2 rounded-md border px-2 py-1.5 mr-1">
+              <Gauge className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="lite-mode" className="text-xs cursor-pointer">Dados Leves</Label>
+              <Switch
+                id="lite-mode"
+                checked={lite}
+                onCheckedChange={(v) => {
+                  setLite(v);
+                  toast.success(v ? "Modo poupança de dados activado" : "Modo completo activado");
+                }}
+              />
+            </div>
             <NotificationsBell />
             {uid && (
               <Link to="/volunteer/$userId" params={{ userId: uid }}>
