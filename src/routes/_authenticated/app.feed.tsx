@@ -160,6 +160,10 @@ function FeedPage() {
   };
 
 
+  const pontos = computePoints(done.projetos, done.horas);
+  const medals = medalsFor(done.projetos, done.horas);
+  const unlocked = done.projetos >= 1;
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -168,47 +172,147 @@ function FeedPage() {
           <p className="text-sm text-muted-foreground">Encontre projetos de impacto onde as suas competências fazem a diferença.</p>
         </div>
 
-        <div className="rounded-lg border bg-card p-3 grid grid-cols-1 md:grid-cols-4 gap-2">
-          <div className="relative md:col-span-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Pesquisar vagas ou ONGs…" className="pl-9" />
-          </div>
-          <Select value={provincia} onValueChange={setProvincia}>
-            <SelectTrigger><SelectValue placeholder="Província" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as províncias</SelectItem>
-              <SelectItem value="Remoto">Remoto</SelectItem>
-              {PROVINCIAS_ANGOLA.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={skill} onValueChange={setSkill}>
-            <SelectTrigger><SelectValue placeholder="Competência" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as competências</SelectItem>
-              {COMPETENCIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
+        <Tabs defaultValue="probono" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="probono">Vagas Pro Bono</TabsTrigger>
+            <TabsTrigger value="estagios" className="gap-1">
+              {!unlocked && <Lock className="h-3 w-3" />} Vagas de Estágio
+            </TabsTrigger>
+          </TabsList>
 
-        {loading ? (
-          <div className="text-sm text-muted-foreground">A carregar vagas…</div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
-            Ainda não há vagas com estes filtros.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((p) => (
-              <ProjectCard
-                key={p.id}
-                project={p}
-                applied={applied.has(p.id)}
-                loading={applyingId === p.id}
-                onApply={() => apply(p.id)}
-              />
-            ))}
-          </div>
-        )}
+          <TabsContent value="probono" className="space-y-6">
+            <div className="rounded-lg border bg-card p-3 grid grid-cols-1 md:grid-cols-4 gap-2">
+              <div className="relative md:col-span-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Pesquisar vagas ou ONGs…" className="pl-9" />
+              </div>
+              <Select value={provincia} onValueChange={setProvincia}>
+                <SelectTrigger><SelectValue placeholder="Província" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as províncias</SelectItem>
+                  <SelectItem value="Remoto">Remoto</SelectItem>
+                  {PROVINCIAS_ANGOLA.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={skill} onValueChange={setSkill}>
+                <SelectTrigger><SelectValue placeholder="Competência" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as competências</SelectItem>
+                  {COMPETENCIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {loading ? (
+              <div className="text-sm text-muted-foreground">A carregar vagas…</div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
+                Ainda não há vagas com estes filtros.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filtered.map((p) => (
+                  <ProjectCard
+                    key={p.id}
+                    project={p}
+                    applied={applied.has(p.id)}
+                    loading={applyingId === p.id}
+                    onApply={() => apply(p.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="estagios" className="space-y-6">
+            {!unlocked ? (
+              <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
+                <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
+                  <Lock className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <h2 className="text-lg font-semibold">Bloqueado</h2>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Conclua pelo menos 1 projeto com uma ONG para liberar candidaturas a estágios.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setDone({ projetos: 1, horas: 40 });
+                    toast.success("Modo demo: projeto concluído registado. Estágios liberados!");
+                  }}
+                >
+                  Simular projeto concluído (demo)
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Card>
+                  <CardContent className="p-5 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-lg bg-[color:var(--brand)]/10 flex items-center justify-center text-[color:var(--brand)]">
+                        <Award className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Os seus pontos</p>
+                        <p className="text-2xl font-semibold">{pontos} pts</p>
+                        <p className="text-xs text-muted-foreground">
+                          {done.projetos} projeto(s) concluído(s) · {done.horas} h registadas
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {medals.map((m) => (
+                        <Badge key={m.name} variant="secondary" title={m.hint}>
+                          <span className="mr-1">{m.emoji}</span> {m.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {DEMO_INTERNSHIPS.map((i) => {
+                    const elegivel = pontos >= i.points_required;
+                    return (
+                      <Card key={i.id} className="flex flex-col">
+                        <CardContent className="p-5 space-y-3 flex-1 flex flex-col">
+                          <div className="flex items-start justify-between gap-2">
+                            <Badge variant="outline" className="gap-1">
+                              <GraduationCap className="h-3 w-3" /> {i.level}
+                            </Badge>
+                            <Badge variant="secondary">{i.area}</Badge>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold leading-tight">{i.title}</h3>
+                            <p className="text-sm text-muted-foreground">{i.company}</p>
+                          </div>
+                          <div className="text-sm space-y-1 text-muted-foreground">
+                            <p className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> {i.provincia}</p>
+                            <p className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {i.duration_months} meses</p>
+                            <p className="flex items-center gap-2 text-foreground font-medium">
+                              <Coins className="h-3.5 w-3.5" /> {fmtKz(i.stipend_kz)} / mês
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Requer {i.points_required} pts · tem {pontos} pts
+                          </p>
+                          <Button
+                            className="mt-auto bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"
+                            disabled={!elegivel}
+                            onClick={() => toast.success(`Candidatura ao estágio enviada a ${i.company}`)}
+                          >
+                            {elegivel ? "Candidatar-me ao estágio" : `Faltam ${i.points_required - pontos} pts`}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </AppShell>
   );
