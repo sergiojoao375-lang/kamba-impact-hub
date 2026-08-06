@@ -2,9 +2,13 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award } from "lucide-react";
+import { LayoutGrid, Briefcase, LogOut, ShieldCheck, User, Building2, Award, Gauge } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { NotificationsBell } from "./NotificationsBell";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useLiteMode } from "@/lib/lite-mode";
+import { toast } from "sonner";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
