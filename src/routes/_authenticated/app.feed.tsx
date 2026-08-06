@@ -5,11 +5,16 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { ProjectCard, type ProjectCardData } from "@/components/kamba/ProjectCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PROVINCIAS_ANGOLA, COMPETENCIAS } from "@/lib/angola";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, Lock, GraduationCap, Award, Clock, MapPin, Coins } from "lucide-react";
 import { notify } from "@/components/kamba/NotificationsBell";
 import { notifyMatch } from "@/lib/whatsapp";
+import { DEMO_INTERNSHIPS, computePoints, medalsFor, fmtKz } from "@/lib/internships";
 
 // Vagas mockadas para demo end-to-end quando não há sessão / DB vazia.
 const DEMO_PROJECTS: ProjectCardData[] = [
