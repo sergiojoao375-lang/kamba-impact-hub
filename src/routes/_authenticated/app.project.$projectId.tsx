@@ -5,7 +5,7 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ChatPanel } from "@/components/kamba/ChatPanel";
 import { useServerFn } from "@tanstack/react-start";
@@ -43,6 +43,7 @@ function ProjectRoom() {
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const [uid, setUid] = useState<string | null>(null);
   const [finalizing, setFinalizing] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const finalizeFn = useServerFn(finalizeProject);
 
   const isDemo = projectId.startsWith("demo-");
@@ -217,12 +218,29 @@ function ProjectRoom() {
           })}
         </div>
 
-        {project && memberIds.length > 0 && (
-          <ChatPanel projectId={projectId} projectTitle={project.title} memberIds={memberIds} />
-        )}
-
         <p className="text-xs text-muted-foreground">Arraste os cartões entre as colunas para atualizar o progresso. Registe as horas nas tarefas concluídas para gerar o certificado.</p>
       </div>
+
+      {/* Chat do Projeto — botão flutuante + janela */}
+      {chatOpen && (
+        <div className="fixed z-50 bottom-4 right-4 w-[min(92vw,380px)] h-[min(70vh,480px)]">
+          <ChatPanel
+            projectId={projectId}
+            projectTitle={project?.title ?? "Projeto"}
+            memberIds={memberIds}
+            demo={isDemo || memberIds.length === 0}
+            onClose={() => setChatOpen(false)}
+          />
+        </div>
+      )}
+      {!chatOpen && (
+        <Button
+          onClick={() => setChatOpen(true)}
+          className="fixed z-50 bottom-4 right-4 rounded-full shadow-lg h-12 px-5 bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 text-[color:var(--brand-foreground)]"
+        >
+          <MessageCircle className="h-5 w-5 mr-2" /> Chat do Projeto 💬
+        </Button>
+      )}
     </AppShell>
   );
 }
