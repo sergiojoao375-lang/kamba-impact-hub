@@ -134,23 +134,24 @@ function ProjectRoom() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-start gap-3 flex-wrap">
           <Link to="/app/ngo"><Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Button></Link>
-          <div className="flex-1 min-w-[200px]">
-            <h1 className="text-2xl font-semibold">{project?.title ?? "Sala do projeto"}</h1>
-            <p className="text-sm text-muted-foreground">{project?.ngo?.name} · Quadro colaborativo</p>
+          <div className="w-full sm:flex-1 sm:w-auto min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold break-words">{project?.title ?? "Sala do projeto"}</h1>
+            <p className="text-sm text-muted-foreground break-words">{project?.ngo?.name} · Quadro colaborativo</p>
           </div>
           {isOwner && (
             <Button
               size="sm"
               onClick={finalize}
               disabled={finalizing}
-              className="bg-[color:var(--impact)] hover:bg-[color:var(--impact)]/90 text-[color:var(--impact-foreground)]"
+              className="w-full sm:w-auto bg-[color:var(--impact)] hover:bg-[color:var(--impact)]/90 text-[color:var(--impact-foreground)]"
             >
               <CheckCircle2 className="h-4 w-4 mr-1" /> {finalizing ? "A calcular…" : "Concluir projeto"}
             </Button>
           )}
         </div>
+
 
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
