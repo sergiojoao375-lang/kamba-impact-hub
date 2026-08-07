@@ -224,7 +224,7 @@ function ProjectRoom() {
 
       {/* Chat do Projeto — botão flutuante + janela */}
       {chatOpen && (
-        <div className="fixed z-50 bottom-4 right-4 w-[min(92vw,380px)] h-[min(70vh,480px)]">
+        <div className="fixed z-50 inset-x-2 bottom-2 top-20 sm:inset-x-auto sm:top-auto sm:bottom-4 sm:right-4 sm:w-[380px] sm:h-[min(70vh,480px)]">
           <ChatPanel
             projectId={projectId}
             projectTitle={project?.title ?? "Projeto"}
@@ -237,11 +237,13 @@ function ProjectRoom() {
       {!chatOpen && (
         <Button
           onClick={() => setChatOpen(true)}
-          className="fixed z-50 bottom-4 right-4 rounded-full shadow-lg h-12 px-5 bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 text-[color:var(--brand-foreground)]"
+          aria-label="Abrir chat do projeto"
+          className="fixed z-50 bottom-4 right-4 rounded-full shadow-lg h-12 w-12 p-0 sm:w-auto sm:px-5 bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 text-[color:var(--brand-foreground)]"
         >
-          <MessageCircle className="h-5 w-5 mr-2" /> Chat do Projeto 💬
+          <MessageCircle className="h-5 w-5 sm:mr-2" /> <span className="hidden sm:inline">Chat do Projeto 💬</span>
         </Button>
       )}
+
     </AppShell>
   );
 }
