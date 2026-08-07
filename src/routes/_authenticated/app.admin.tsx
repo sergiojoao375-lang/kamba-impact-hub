@@ -168,7 +168,7 @@ function AdminPanel() {
 
         <Card>
           <CardContent className="p-0 overflow-x-auto">
-            <Table>
+            <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome da ONG</TableHead>

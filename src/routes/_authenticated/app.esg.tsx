@@ -263,7 +263,7 @@ function EsgDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Colaborador</TableHead>
@@ -318,7 +318,7 @@ function TalentPool() {
         </Button>
       </CardHeader>
       <CardContent className="overflow-x-auto">
-        <Table>
+        <Table className="min-w-[680px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">#</TableHead>
