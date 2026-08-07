@@ -134,23 +134,24 @@ function ProjectRoom() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-start gap-3 flex-wrap">
           <Link to="/app/ngo"><Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Button></Link>
-          <div className="flex-1 min-w-[200px]">
-            <h1 className="text-2xl font-semibold">{project?.title ?? "Sala do projeto"}</h1>
-            <p className="text-sm text-muted-foreground">{project?.ngo?.name} · Quadro colaborativo</p>
+          <div className="w-full sm:flex-1 sm:w-auto min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold break-words">{project?.title ?? "Sala do projeto"}</h1>
+            <p className="text-sm text-muted-foreground break-words">{project?.ngo?.name} · Quadro colaborativo</p>
           </div>
           {isOwner && (
             <Button
               size="sm"
               onClick={finalize}
               disabled={finalizing}
-              className="bg-[color:var(--impact)] hover:bg-[color:var(--impact)]/90 text-[color:var(--impact-foreground)]"
+              className="w-full sm:w-auto bg-[color:var(--impact)] hover:bg-[color:var(--impact)]/90 text-[color:var(--impact-foreground)]"
             >
               <CheckCircle2 className="h-4 w-4 mr-1" /> {finalizing ? "A calcular…" : "Concluir projeto"}
             </Button>
           )}
         </div>
+
 
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -159,7 +160,7 @@ function ProjectRoom() {
             return (
               <div
                 key={col.key}
-                className={`rounded-lg border ${col.tone} p-3 min-h-[300px] flex flex-col`}
+                className={`rounded-lg border ${col.tone} p-3 min-h-[180px] md:min-h-[300px] flex flex-col`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => { if (dragId) { move(dragId, col.key); setDragId(null); } }}
               >
@@ -223,7 +224,7 @@ function ProjectRoom() {
 
       {/* Chat do Projeto — botão flutuante + janela */}
       {chatOpen && (
-        <div className="fixed z-50 bottom-4 right-4 w-[min(92vw,380px)] h-[min(70vh,480px)]">
+        <div className="fixed z-50 inset-x-2 bottom-2 top-20 sm:inset-x-auto sm:top-auto sm:bottom-4 sm:right-4 sm:w-[380px] sm:h-[min(70vh,480px)]">
           <ChatPanel
             projectId={projectId}
             projectTitle={project?.title ?? "Projeto"}
@@ -236,11 +237,13 @@ function ProjectRoom() {
       {!chatOpen && (
         <Button
           onClick={() => setChatOpen(true)}
-          className="fixed z-50 bottom-4 right-4 rounded-full shadow-lg h-12 px-5 bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 text-[color:var(--brand-foreground)]"
+          aria-label="Abrir chat do projeto"
+          className="fixed z-50 bottom-4 right-4 rounded-full shadow-lg h-12 w-12 p-0 sm:w-auto sm:px-5 bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 text-[color:var(--brand-foreground)]"
         >
-          <MessageCircle className="h-5 w-5 mr-2" /> Chat do Projeto 💬
+          <MessageCircle className="h-5 w-5 sm:mr-2" /> <span className="hidden sm:inline">Chat do Projeto 💬</span>
         </Button>
       )}
+
     </AppShell>
   );
 }

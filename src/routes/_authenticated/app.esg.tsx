@@ -161,12 +161,12 @@ function EsgDashboard() {
               <Badge variant="outline">ESG · Balanço Social</Badge>
               <Badge variant={live ? "default" : "secondary"}>{live ? "Dados reais" : "Demonstração"}</Badge>
             </div>
-            <h1 className="mt-2 text-2xl font-semibold">Impacto da sua Empresa</h1>
+            <h1 className="mt-2 text-xl sm:text-2xl font-semibold">Impacto da sua Empresa</h1>
             <p className="text-sm text-muted-foreground">
               Meça o retorno social do voluntariado corporativo — em Kwanzas, horas e ODS.
             </p>
           </div>
-          <Button onClick={() => exportPdf(KPIS)} className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90">
+          <Button onClick={() => exportPdf(KPIS)} className="w-full sm:w-auto bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90">
             <Download className="h-4 w-4 mr-2" /> Exportar Relatório ESG (PDF)
           </Button>
         </div>
@@ -183,7 +183,7 @@ function EsgDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
               <CardHeader><CardTitle className="text-base">Alinhamento com ODS da ONU</CardTitle></CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow><TableHead>Objetivo</TableHead><TableHead className="text-right">Peso</TableHead></TableRow>
@@ -201,7 +201,7 @@ function EsgDashboard() {
             </Card>
             <Card>
               <CardHeader><CardTitle className="text-base">Horas por Departamento</CardTitle></CardHeader>
-              <CardContent>
+              <CardContent className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow><TableHead>Departamento</TableHead><TableHead className="text-right">Horas</TableHead></TableRow>
@@ -262,8 +262,8 @@ function EsgDashboard() {
               <Briefcase className="h-4 w-4" /> Colaboradores em Projetos Pro Bono
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
+          <CardContent className="overflow-x-auto">
+            <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Colaborador</TableHead>
@@ -304,20 +304,21 @@ function EsgDashboard() {
 function TalentPool() {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 space-y-0">
         <CardTitle className="text-base flex items-center gap-2">
           <Trophy className="h-4 w-4" /> Banco de Talentos &amp; Estágios
         </CardTitle>
         <Button
           size="sm"
           variant="outline"
+          className="w-full sm:w-auto"
           onClick={() => toast.success("Vaga de estágio publicada — visível para voluntários elegíveis")}
         >
           <GraduationCap className="h-4 w-4 mr-2" /> Publicar Vaga de Estágio
         </Button>
       </CardHeader>
-      <CardContent>
-        <Table>
+      <CardContent className="overflow-x-auto">
+        <Table className="min-w-[680px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">#</TableHead>
