@@ -145,9 +145,9 @@ function NgoDashboard() {
   return (
     <AppShell>
       <div className="space-y-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">Painel da ONG</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold">Painel da ONG</h1>
             <p className="text-sm text-muted-foreground">
               {ngo ? <>Organização: <span className="font-medium text-foreground">{ngo.name}</span> · Status: <Badge variant={ngo.status === "aprovado" ? "default" : "secondary"}>{ngo.status}</Badge></> : "Complete o cadastro da sua ONG para começar."}
             </p>
@@ -155,7 +155,7 @@ function NgoDashboard() {
           {ngo && ngo.status === "aprovado" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"><Plus className="h-4 w-4 mr-2" /> Publicar Nova Vaga</Button>
+                <Button className="w-full sm:w-auto bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90"><Plus className="h-4 w-4 mr-2" /> Publicar Nova Vaga</Button>
               </DialogTrigger>
               <NewProjectDialog
                 ngoId={ngo.id}
@@ -169,7 +169,7 @@ function NgoDashboard() {
             </Dialog>
           )}
           {ngo && ngo.status !== "aprovado" && (
-            <Button disabled variant="outline" title="Verificação pendente">
+            <Button disabled variant="outline" className="w-full sm:w-auto" title="Verificação pendente">
               <Lock className="h-4 w-4 mr-2" /> Publicação bloqueada
             </Button>
           )}
@@ -191,7 +191,7 @@ function NgoDashboard() {
 
 
         {demo && (
-          <div className="flex items-start justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm">
             <div className="flex items-start gap-3">
               <TriangleAlert className="h-4 w-4 mt-0.5 text-amber-600 shrink-0" />
               <div>

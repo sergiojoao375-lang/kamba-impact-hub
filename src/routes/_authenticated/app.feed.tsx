@@ -168,12 +168,12 @@ function FeedPage() {
     <AppShell>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Vagas Pro Bono</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold">Vagas Pro Bono</h1>
           <p className="text-sm text-muted-foreground">Encontre projetos de impacto onde as suas competências fazem a diferença.</p>
         </div>
 
         <Tabs defaultValue="probono" className="space-y-6">
-          <TabsList>
+          <TabsList className="w-full grid grid-cols-2 sm:inline-flex sm:w-auto">
             <TabsTrigger value="probono">Vagas Pro Bono</TabsTrigger>
             <TabsTrigger value="estagios" className="gap-1">
               {!unlocked && <Lock className="h-3 w-3" />} Vagas de Estágio
@@ -248,7 +248,7 @@ function FeedPage() {
             ) : (
               <>
                 <Card>
-                  <CardContent className="p-5 flex flex-wrap items-center justify-between gap-4">
+                  <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-lg bg-[color:var(--brand)]/10 flex items-center justify-center text-[color:var(--brand)]">
                         <Award className="h-6 w-6" />

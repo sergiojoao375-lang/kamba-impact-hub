@@ -160,7 +160,7 @@ function ProjectRoom() {
             return (
               <div
                 key={col.key}
-                className={`rounded-lg border ${col.tone} p-3 min-h-[300px] flex flex-col`}
+                className={`rounded-lg border ${col.tone} p-3 min-h-[180px] md:min-h-[300px] flex flex-col`}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => { if (dragId) { move(dragId, col.key); setDragId(null); } }}
               >
