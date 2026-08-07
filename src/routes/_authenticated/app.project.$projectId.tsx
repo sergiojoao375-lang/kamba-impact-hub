@@ -5,7 +5,7 @@ import { AppShell } from "@/components/kamba/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Clock, CheckCircle2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ChatPanel } from "@/components/kamba/ChatPanel";
 import { useServerFn } from "@tanstack/react-start";
@@ -43,6 +43,7 @@ function ProjectRoom() {
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const [uid, setUid] = useState<string | null>(null);
   const [finalizing, setFinalizing] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const finalizeFn = useServerFn(finalizeProject);
 
   const isDemo = projectId.startsWith("demo-");
